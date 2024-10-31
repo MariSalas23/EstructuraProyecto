@@ -1,10 +1,10 @@
-Nombres: 
+**Nombres:**  
 
-SISTEMA DE GESTIÓN DE BIBLIOTECA
+**SISTEMA DE GESTIÓN DE BIBLIOTECA**
 
 Crear un sistema de gestión de biblioteca que permita realizar operaciones de búsqueda, ordenamiento, inserción, eliminación y visualización de libros. 
  
-Requisitos: 
+**Requisitos:** 
 
 1. Crear una estructura de datos para almacenar información de libros (título, autor, género, año de publicación, entre otros). 
 2. Implementar un árbol binario de búsqueda para almacenar los libros por título. 
