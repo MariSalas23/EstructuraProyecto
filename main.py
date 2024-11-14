@@ -1,152 +1,87 @@
 import tkinter as tk
-from tkinter import font, messagebox
-from libro import Libro
-from BalancedTree import BalancedTree 
+from tkinter import font
+from example import LibraryApp  # Importa LibraryApp desde el archivo example.py
+from insercion import InsertWindow
 
-class Main:
+class MainInterface:
     def __init__(self):
+        # Configuración de colores
+        self.dark_blue = "#6c93a4"
+        self.red = "#ef6869"
+        self.blue = "#2f4f74"
+        self.light_blue = "#b5ccd2"
+        self.light_red = "#f5e2e4"
+        self.white = "#ffffff"
+
+        # Configuración de la ventana principal
         self.window = tk.Tk()
         self.window.title("Biblioteca")
-        self.window.geometry("600x500")
-        self.window.configure(background="#E9D0FF")
-        
-        self.libro = Libro()
-        self.arbol = BalancedTree()  ##aqui lo que deben hacer es crear otros archivos
-        #self.arboln= NarioTree()
-        #self.arbolB=BinarioTree()
-        
-        self.crear_interfaz()
-        
-    def crear_interfaz(self):
-        custom_font = font.Font(family="Helvetica", size=12, weight="bold")
-        
-        titulo_label = tk.Label(self.window, text="Biblioteca", font=custom_font, bg="#E9D0FF", fg="#8145A4")
-        titulo_label.pack(pady=10)
+        self.window.geometry("465x415")
+        self.window.configure(background=self.dark_blue)
 
-        subtitulo_label = tk.Label(self.window, text="¿Qué desea hacer?", font=custom_font, bg="#E9D0FF", fg="#8145A4")
-        subtitulo_label.pack(pady=10)
-        
-        # Frame de opciones
-        opciones_frame = tk.Frame(self.window, background="#F1E1FE", pady=10)
-        opciones_frame.pack(fill=tk.BOTH, padx=20)
-        
-        # Botones principales
-        tk.Button(opciones_frame, text="Agregar Libro", command=self.mostrar_formulario_agregar, 
-                  bg="#8145A4", fg="white", font=("Helvetica", 12), width=15).grid(row=0, column=0, padx=10, pady=5)
-        tk.Button(opciones_frame, text="Buscar Libro", command=self.mostrar_formulario_buscar, 
-                  bg="#8145A4", fg="white", font=("Helvetica", 12), width=15).grid(row=0, column=1, padx=10, pady=5)
-        
-        tk.Button(opciones_frame, text="Visualización", command=self.mostrar_formulario_ver, 
-                  bg="#8145A4", fg="white", font=("Helvetica", 12), width=15).grid(row=1, column=0, padx=10, pady=5)
-        
-        tk.Button(opciones_frame, text="Ordenar por Año", command=self.mostrar_formulario_ordenamiento, 
-                  bg="#8145A4", fg="white", font=("Helvetica", 12), width=15).grid(row=1, column=1, padx=10, pady=5)
+        # Definir fuentes personalizadas
+        title_font = font.Font(family="Open Sans", size=24, weight="bold")
+        subtitle_font = font.Font(family="Open Sans", size=12, slant="italic")
+        button_font = font.Font(family="Open Sans", size=12, weight="bold")
 
-        self.resultados_frame = tk.Frame(self.window, bg="#E9D0FF")
-        self.resultados_frame.pack(fill=tk.BOTH, expand=True, padx=20, pady=20)
+        # Crear marco con borde
+        outer_frame = tk.Frame(self.window, background=self.red, padx=10, pady=10)
+        outer_frame.pack(fill="both", expand=True, padx=20, pady=20)
 
-    def mostrar_formulario_agregar(self):
-        
-        for widget in self.resultados_frame.winfo_children():
-            widget.destroy()
-        
-        tk.Label(self.resultados_frame, text="Agregar Libro", bg="#E9D0FF", font=("Helvetica", 12)).grid(row=0, column=0, columnspan=2, pady=10)
-        
-        # Entradas de datos
-        fields = ["ISBN", "Título", "Autor", "Género", "Año Publicación", "Cantidad"]
-        self.entries = {}
-        
-        for i, field in enumerate(fields):
-            tk.Label(self.resultados_frame, text=field, bg="#E9D0FF").grid(row=i+1, column=0, sticky="w")
-            entry = tk.Entry(self.resultados_frame)
-            entry.grid(row=i+1, column=1)
-            self.entries[field] = entry
-        
-        tk.Button(self.resultados_frame, text="Agregar", command=self.agregar_libro, bg="#8145A4", fg="white").grid(row=len(fields)+1, column=0, columnspan=2, pady=10)
+        middle_frame = tk.Frame(outer_frame, background=self.blue, padx=5, pady=5)
+        middle_frame.pack(fill="both", expand=True)
 
-    def agregar_libro(self):
-        isbn = self.entries["ISBN"].get()
-        titulo = self.entries["Título"].get()
-        autor = self.entries["Autor"].get()
-        genero = self.entries["Género"].get()
-        año_publicacion = int(self.entries["Año Publicación"].get())
-        cantidad = int(self.entries["Cantidad"].get())
+        inner_frame = tk.Frame(middle_frame, background=self.light_blue, padx=20, pady=20)
+        inner_frame.pack(fill="both", expand=True)
 
-        mensaje = self.libro.agregar_libro(isbn, titulo, autor, genero, año_publicacion, cantidad)
-        self.arbol.insert(año_publicacion)  
-        messagebox.showinfo("Resultado", mensaje)
+        # Contenedor blanco dentro del inner_frame
+        content_frame = tk.Frame(inner_frame, background=self.white, padx=20, pady=20)
+        content_frame.pack(fill="both", expand=True)
 
-    def mostrar_formulario_buscar(self):
-        for widget in self.resultados_frame.winfo_children():
-            widget.destroy()
+        # Título y subtítulo
+        title_label = tk.Label(content_frame, text="Biblioteca", font=title_font, background=self.white, foreground=self.blue)
+        title_label.pack(pady=10)
 
-        # Formulario para buscar libros
-        tk.Label(self.resultados_frame, text="Buscar Libro", bg="#E9D0FF", font=("Helvetica", 12)).grid(row=0, column=0, columnspan=2, pady=10)
-        # Selección de criterio de búsqueda
-        tk.Label(self.resultados_frame, text="Criterio:", bg="#E9D0FF").grid(row=1, column=0, sticky="w")
-        self.criterio_var = tk.StringVar()
-        self.criterio_var.set("titulo")
-        criterios = ["titulo", "autor", "genero", "año_publicacion"]
-        self.criterio_menu = tk.OptionMenu(self.resultados_frame, self.criterio_var, *criterios)
-        self.criterio_menu.grid(row=1, column=1, sticky="w")
-        
-        # Entrada de valor de búsqueda
-        tk.Label(self.resultados_frame, text="Valor:", bg="#E9D0FF").grid(row=2, column=0, sticky="w")
-        self.valor_entry = tk.Entry(self.resultados_frame)
-        self.valor_entry.grid(row=2, column=1, sticky="w")
-        
-        tk.Button(self.resultados_frame, text="Buscar", command=self.buscar_libro, bg="#8145A4", fg="white").grid(row=3, column=0, columnspan=2, pady=10)
+        subtitle_label = tk.Label(content_frame, text="¿Qué acción desea?", font=subtitle_font, background=self.white, foreground=self.blue)
+        subtitle_label.pack(pady=5)
 
-    def buscar_libro(self):
-        criterio = self.criterio_var.get()
-        valor = self.valor_entry.get()
-        resultados = self.libro.buscar_libro(criterio, valor)
-        
-        if resultados:
-            resultados_texto = "\n".join([f"{libro['titulo']} - {libro['autor']} ({libro['año_publicacion']})" for libro in resultados])
-            messagebox.showinfo("Resultados", resultados_texto)
-        else:
-            messagebox.showinfo("Resultados", "No se encontraron libros.")
+        # Frame para los botones dentro del content_frame
+        button_frame = tk.Frame(content_frame, background=self.white)
+        button_frame.pack(pady=15)
 
-    def mostrar_formulario_ordenamiento(self):
-        
-        for widget in self.resultados_frame.winfo_children():
-            widget.destroy()
-        
-        tk.Label(self.resultados_frame, text="Ordenar Libros por Año", bg="#E9D0FF", font=("Helvetica", 12)).grid(row=0, column=0, columnspan=2, pady=10)
-        
-        # Botones para ver los árboles
-        tk.Button(self.resultados_frame, text="Ver Árbol Binario", command=self.mostrar_arbol_binario, 
-                  bg="#8145A4", fg="white").grid(row=1, column=0, padx=10, pady=5)
-        tk.Button(self.resultados_frame, text="Ver Árbol N-ario", command=self.mostrar_arbol_n_ari, 
-                  bg="#8145A4", fg="white").grid(row=1, column=1, padx=10, pady=5)
-        tk.Button(self.resultados_frame, text="Ver Árbol Balanceado", command=self.mostrar_arbol_balanceado, 
-                  bg="#8145A4", fg="white").grid(row=2, column=0, columnspan=2, pady=10)
-    def mostrar_formulario_ver(self):
-        pass
-    def mostrar_arbol_binario(self):
-        messagebox.showinfo("Árbol Binario", "El árbol binario aún no está implementado.")
+        # Crear botones con el comando correspondiente
+        self.create_button(button_frame, "Inserción", self.open_insert_window, self.red, button_font, 0, 0)
+        self.create_button(button_frame, "Búsqueda", self.search_book, self.blue, button_font, 0, 1)
+        self.create_button(button_frame, "Eliminación", self.delete_book, self.blue, button_font, 1, 0)
+        self.create_button(button_frame, "Visualización", self.view_books, self.red, button_font, 1, 1)
 
-    def mostrar_arbol_n_ari(self):
-        messagebox.showinfo("Árbol N-ario", "El árbol N-ario aún no está implementado.")
+    def create_button(self, parent, text, command, color, font, row, column):
+        button = tk.Button(parent, text=text, command=command, bg=color, fg="white",
+                           font=font, width=12, height=2, relief=tk.FLAT)
+        button.grid(row=row, column=column, padx=10, pady=10)
 
-    def mostrar_arbol_balanceado(self):
-        for widget in self.resultados_frame.winfo_children():
-            widget.destroy()
+    def open_insert_window(self):
+        # Cierra la ventana principal y abre la interfaz de inserción en una nueva ventana
+        self.window.destroy()
+        new_window = tk.Tk()
+        InsertWindow(new_window)
+        new_window.mainloop()
 
-        tk.Label(self.resultados_frame, text="Libros Ordenados por Año de Publicación", bg="#E9D0FF", font=("Helvetica", 12)).grid(row=0, column=0, columnspan=2, pady=10)
+    def search_book(self):
+        self.window.destroy()
+        new_window = tk.Tk()
+        LibraryApp(new_window)
+        new_window.mainloop()
 
-        libros_ordenados = self.arbol.get_level_order()  
-        
-        if libros_ordenados:
-            resultados_texto = "\n".join([str(libro) for libro in libros_ordenados])
-            messagebox.showinfo("Libros Ordenados", resultados_texto)
-        else:
-            messagebox.showinfo("Libros Ordenados", "No hay libros en el árbol.")
+    def delete_book(self):
+        tk.messagebox.showinfo("Eliminación", "Función de eliminación de libro aquí")
+
+    def view_books(self):
+        tk.messagebox.showinfo("Visualización", "Función de visualización de libros aquí")
 
     def run(self):
         self.window.mainloop()
 
-if __name__ == "__main__": 
-    app = Main()
+if __name__ == "__main__":
+    app = MainInterface()
     app.run()
