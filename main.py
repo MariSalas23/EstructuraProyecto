@@ -2,6 +2,7 @@ import tkinter as tk
 from tkinter import font
 from example import LibraryApp  # Importa LibraryApp desde el archivo example.py
 from insercion import InsertWindow
+from eliminar import DeleteWindow  # Importa DeleteWindow desde eliminar.py
 
 class MainInterface:
     def __init__(self):
@@ -74,7 +75,10 @@ class MainInterface:
         new_window.mainloop()
 
     def delete_book(self):
-        tk.messagebox.showinfo("Eliminación", "Función de eliminación de libro aquí")
+        self.window.destroy()
+        new_window = tk.Tk()
+        DeleteWindow(new_window)
+        new_window.mainloop()
 
     def view_books(self):
         tk.messagebox.showinfo("Visualización", "Función de visualización de libros aquí")
