@@ -71,7 +71,7 @@ class LibraryApp:
         filters_frame = tk.Frame(filters_frame_border, background=white, padx=10, pady=10)
         filters_frame.pack(fill="y", expand=True)
         
-        filters_title = tk.Label(filters_frame, text="Filtros", font=title_font, bg=white, fg=blue)
+        filters_title = tk.Label(filters_frame, text="Filtros", font=title_font, bg=white, fg=blue, pady=17)
         filters_title.pack(pady=(0, 20))
         
         # Clasificar por
@@ -92,11 +92,11 @@ class LibraryApp:
         
         asc_button = tk.Button(filters_frame, text="Menor a mayor", command=self.sort_asc,
                                bg=red, fg="white", font=button_font, relief=tk.FLAT)
-        asc_button.pack(fill="x", padx=10, pady=5)
+        asc_button.pack(fill="x", padx=10, pady=8)
         
         desc_button = tk.Button(filters_frame, text="Mayor a menor", command=self.sort_desc,
                                 bg=red, fg="white", font=button_font, relief=tk.FLAT)
-        desc_button.pack(fill="x", padx=10, pady=5)
+        desc_button.pack(fill="x", padx=10, pady=8)
 
     def search_books(self):
         # Implementación de búsqueda
