@@ -70,7 +70,13 @@ class DeleteWindow:
         if isbn:
             # Llama al método eliminar_libro de la clase Libro
             result = self.libro_manager.eliminar_libro(isbn)
-            messagebox.showinfo("Resultado", result)
+
+            # Comprobar si la eliminación fue exitosa
+            if "eliminado correctamente" in result.lower():
+                messagebox.showinfo("Resultado", result)
+                self.isbn_entry.delete(0, tk.END)  # Limpia el campo de entrada si la eliminación fue exitosa
+            else:
+                messagebox.showwarning("Resultado", result)  # Muestra un aviso si el libro no se encuentra
         else:
             messagebox.showerror("Error", "Por favor, ingrese un ISBN válido.")
 

@@ -4,6 +4,7 @@ from n_ario import GenreTree
 from libro import Libro  # Importar la clase Libro para manejar persistencia
 import subprocess
 
+
 class InsertWindow:
     def __init__(self, root):
         self.root = root
@@ -26,6 +27,9 @@ class InsertWindow:
         self.genre_tree = GenreTree()
         self.selected_genre = tk.StringVar(value="Género seleccionado: Ninguno")
 
+        # Validación para campos numéricos
+        validate_numeric = self.root.register(self.only_numeric)
+
         # Diseño de la ventana
         background_frame = tk.Frame(self.root, background=light_blue, padx=10, pady=10)
         background_frame.pack(fill="both", expand=True)
@@ -46,63 +50,83 @@ class InsertWindow:
         tk.Label(content_frame, text="Agregar Libro", font=title_font, bg=light_red, fg=blue).grid(row=0, column=0, columnspan=2, pady=(0, 20))
 
         # Campos de entrada
-        fields = ["ISBN", "Título", "Autor", "Año Publicación", "Cantidad"]
         self.entries = {}
-
-        for i, field in enumerate(fields):
-            tk.Label(content_frame, text=field, bg=light_red, fg=blue).grid(row=i + 1, column=0, sticky="w", padx=10, pady=5)
-            entry = tk.Entry(content_frame, width=29)  # Ajuste de ancho del input
-            entry.grid(row=i + 1, column=1, padx=10, pady=5)
-            self.entries[field] = entry
+        self.create_label_and_entry(content_frame, "ISBN", 1, validate_numeric)
+        self.create_label_and_entry(content_frame, "Título", 2)
+        self.create_label_and_entry(content_frame, "Autor", 3)
+        self.create_label_and_entry(content_frame, "Año Publicación", 4, validate_numeric)
+        self.create_label_and_entry(content_frame, "Cantidad", 5, validate_numeric)
 
         # Botón para seleccionar género
-        tk.Label(content_frame, text="Género", bg=light_red, fg=blue).grid(row=len(fields) + 1, column=0, sticky="w", padx=10, pady=5)
-        tk.Button(content_frame, text="Selec. Género", command=self.select_genre, bg=blue, fg="white", font=button_font, width=17, relief=tk.FLAT).grid(row=len(fields) + 1, column=1, padx=10, pady=5)
+        tk.Label(content_frame, text="Género", bg=light_red, fg=blue).grid(row=6, column=0, sticky="w", padx=10, pady=5)
+        tk.Button(content_frame, text="Selec. Género", command=self.select_genre, bg=blue, fg="white", font=button_font, width=17, relief=tk.FLAT).grid(row=6, column=1, padx=10, pady=5)
 
         # Mostrar género seleccionado
-        tk.Label(content_frame, textvariable=self.selected_genre, bg=light_red, fg=red).grid(row=len(fields) + 2, column=0, columnspan=2, pady=(5, 5))
+        tk.Label(content_frame, textvariable=self.selected_genre, bg=light_red, fg=red).grid(row=7, column=0, columnspan=2, pady=(5, 5))
 
         # Botones de acción
         button_frame = tk.Frame(content_frame, background=light_red)
-        button_frame.grid(row=len(fields) + 3, column=0, columnspan=2, pady=(25, 10))
-        button_frame.grid(row=len(fields) + 3, column=0, columnspan=2, pady=(25, 10))
+        button_frame.grid(row=8, column=0, columnspan=2, pady=(25, 10))
 
         tk.Button(button_frame, text="Agregar", command=self.agregar_libro, bg=red, fg="white", font=button_font, width=13, height=1, relief=tk.FLAT).pack(side="left", padx=10)
         tk.Button(button_frame, text="Regresar", command=self.regresar, bg=blue, fg="white", font=button_font, width=13, height=1, relief=tk.FLAT).pack(side="left", padx=10)
 
+    def create_label_and_entry(self, parent, label_text, row, validate_command=None):
+        """Crea un label y un campo de entrada en una fila específica."""
+        tk.Label(parent, text=label_text, bg="#f5e2e4", fg="#2f4f74").grid(row=row, column=0, sticky="w", padx=10, pady=5)
+        entry = tk.Entry(parent, width=29, validate="key", validatecommand=(validate_command, "%S")) if validate_command else tk.Entry(parent, width=29)
+        entry.grid(row=row, column=1, padx=10, pady=5)
+        self.entries[label_text] = entry
+
     def select_genre(self):
-        # Usar el árbol n-ario para seleccionar el género
         genre = self.genre_tree.find_genre()
         if genre:
-            self.selected_genre.set(f"Género seleccionado: {genre}")
+            self.selected_genre.set(f"Género seleccionado: {genre.upper()}")
         else:
             self.selected_genre.set("Género seleccionado: Ninguno")
 
     def agregar_libro(self):
         try:
             # Recolectar datos ingresados por el usuario
-            isbn = self.entries["ISBN"].get().strip()
-            titulo = self.entries["Título"].get().strip()
-            autor = self.entries["Autor"].get().strip()
-            año_publicacion = int(self.entries["Año Publicación"].get().strip())
-            cantidad = int(self.entries["Cantidad"].get().strip())
-            genero = self.selected_genre.get().replace("Género seleccionado: ", "").strip()
+            isbn = self.entries["ISBN"].get().strip().upper()
+            titulo = self.entries["Título"].get().strip().upper()
+            autor = self.entries["Autor"].get().strip().upper()
+            año_publicacion = self.entries["Año Publicación"].get().strip()
+            cantidad = self.entries["Cantidad"].get().strip()
+            genero = self.selected_genre.get().replace("Género seleccionado: ", "").strip().upper()
 
-            # Validar selección de género
-            if genero == "Ninguno":
-                raise ValueError("Debe seleccionar un género.")
+            # Validar que todos los campos estén llenos
+            if not all([isbn, titulo, autor, año_publicacion, cantidad, genero]) or genero == "NINGUNO":
+                raise ValueError("Todos los campos deben ser completados.")
 
-            # Validar campos obligatorios
-            if not all([isbn, titulo, autor, año_publicacion, cantidad]):
-                raise ValueError("Todos los campos son obligatorios.")
+            # Validar que los campos numéricos sean válidos
+            año_publicacion = int(año_publicacion)
+            cantidad = int(cantidad)
 
             # Validar ISBN
-            if not isbn.isdigit() or len(isbn) not in [10, 13]:
-                raise ValueError("El ISBN debe ser un número de 10 o 13 dígitos.")
+            if len(isbn) not in [10, 13]:
+                raise ValueError("El ISBN debe contener exactamente 10 o 13 dígitos.")
+
+
+            # Validar año de publicación
+            if año_publicacion < 0 or año_publicacion > 2024:
+                raise ValueError("El año de publicación debe estar entre 0 y 2024.")
+
+            # Validar cantidad
+            if cantidad < 0:
+                raise ValueError("La cantidad no puede ser un número negativo.")
 
             # Guardar libro en el archivo
             mensaje = self.libro_manager.agregar_libro(isbn, titulo, autor, genero, año_publicacion, cantidad)
+
+            # Si se agrega exitosamente, mostrar mensaje y limpiar campos
             messagebox.showinfo("Resultado", mensaje)
+
+            # Limpiar los campos solo si se agrega correctamente
+            if "agregado correctamente" in mensaje:
+                for field in self.entries.values():
+                    field.delete(0, tk.END)
+                self.selected_genre.set("Género seleccionado: Ninguno")
 
         except ValueError as ve:
             messagebox.showerror("Error", str(ve))
@@ -112,3 +136,6 @@ class InsertWindow:
     def regresar(self):
         self.root.destroy()
         subprocess.Popen(["python", "main.py"])
+
+    def only_numeric(self, char):
+        return char.isdigit()
