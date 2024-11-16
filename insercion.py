@@ -1,13 +1,14 @@
 import tkinter as tk
 from tkinter import font, messagebox
-from n_ario import GenreTree 
+from n_ario import GenreTree
+from libro import Libro  # Importar la clase Libro para manejar persistencia
 import subprocess
 
 class InsertWindow:
     def __init__(self, root):
         self.root = root
         self.root.title("Agregar Libro")
-        self.root.geometry("500x525")  # Ajuste al ancho de la ventana para acomodar inputs más largos
+        self.root.geometry("490x525")
 
         # Configuración de colores y fuentes
         dark_blue = "#6c93a4"
@@ -17,6 +18,9 @@ class InsertWindow:
         light_red = "#f5e2e4"
         button_font = font.Font(family="Open Sans", size=12, weight="bold")
         title_font = font.Font(family="Open Sans", size=20, weight="bold")
+
+        # Instancia de la clase Libro para manejar persistencia
+        self.libro_manager = Libro()
 
         # Árbol de géneros
         self.genre_tree = GenreTree()
@@ -47,13 +51,13 @@ class InsertWindow:
 
         for i, field in enumerate(fields):
             tk.Label(content_frame, text=field, bg=light_red, fg=blue).grid(row=i + 1, column=0, sticky="w", padx=10, pady=5)
-            entry = tk.Entry(content_frame, width=30)  # Ajuste de ancho del input
+            entry = tk.Entry(content_frame, width=29)  # Ajuste de ancho del input
             entry.grid(row=i + 1, column=1, padx=10, pady=5)
             self.entries[field] = entry
 
         # Botón para seleccionar género
         tk.Label(content_frame, text="Género", bg=light_red, fg=blue).grid(row=len(fields) + 1, column=0, sticky="w", padx=10, pady=5)
-        tk.Button(content_frame, text="Selec. Género", command=self.select_genre, bg=blue, fg="white", font=button_font).grid(row=len(fields) + 1, column=1, padx=10, pady=5)
+        tk.Button(content_frame, text="Selec. Género", command=self.select_genre, bg=blue, fg="white", font=button_font, width=17, relief=tk.FLAT).grid(row=len(fields) + 1, column=1, padx=10, pady=5)
 
         # Mostrar género seleccionado
         tk.Label(content_frame, textvariable=self.selected_genre, bg=light_red, fg=red).grid(row=len(fields) + 2, column=0, columnspan=2, pady=(5, 5))
@@ -61,9 +65,10 @@ class InsertWindow:
         # Botones de acción
         button_frame = tk.Frame(content_frame, background=light_red)
         button_frame.grid(row=len(fields) + 3, column=0, columnspan=2, pady=(25, 10))
+        button_frame.grid(row=len(fields) + 3, column=0, columnspan=2, pady=(25, 10))
 
-        tk.Button(button_frame, text="Agregar", command=self.agregar_libro, bg=red, fg="white", font=button_font, width=11, height=1, relief=tk.FLAT).pack(side="left", padx=10)
-        tk.Button(button_frame, text="Regresar", command=self.regresar, bg=blue, fg="white", font=button_font, width=11, height=1, relief=tk.FLAT).pack(side="left", padx=10)
+        tk.Button(button_frame, text="Agregar", command=self.agregar_libro, bg=red, fg="white", font=button_font, width=13, height=1, relief=tk.FLAT).pack(side="left", padx=10)
+        tk.Button(button_frame, text="Regresar", command=self.regresar, bg=blue, fg="white", font=button_font, width=13, height=1, relief=tk.FLAT).pack(side="left", padx=10)
 
     def select_genre(self):
         # Usar el árbol n-ario para seleccionar el género
@@ -95,8 +100,8 @@ class InsertWindow:
             if not isbn.isdigit() or len(isbn) not in [10, 13]:
                 raise ValueError("El ISBN debe ser un número de 10 o 13 dígitos.")
 
-            # Mostrar confirmación
-            mensaje = f"Libro agregado: {titulo} ({año_publicacion}) - {genero}"
+            # Guardar libro en el archivo
+            mensaje = self.libro_manager.agregar_libro(isbn, titulo, autor, genero, año_publicacion, cantidad)
             messagebox.showinfo("Resultado", mensaje)
 
         except ValueError as ve:

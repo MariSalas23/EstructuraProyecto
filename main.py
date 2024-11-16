@@ -15,6 +15,9 @@ class MainInterface:
         self.light_red = "#f5e2e4"
         self.white = "#ffffff"
 
+        # Crear la instancia de Libro (con persistencia)
+        self.libro_instance = Libro()  # Instancia global de Libro
+
         # Configuración de la ventana principal
         self.window = tk.Tk()
         self.window.title("Biblioteca")
@@ -80,7 +83,7 @@ class MainInterface:
         # Cierra la ventana principal y abre la interfaz de eliminación, pasando la instancia de libro
         self.window.destroy()
         new_window = tk.Tk()
-        DeleteWindow(new_window, self.libro_instance)
+        DeleteWindow(new_window)
         new_window.mainloop()
 
     def view_books(self):

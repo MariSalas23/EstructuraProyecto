@@ -1,13 +1,16 @@
 import tkinter as tk
 from tkinter import messagebox, font
+from libro import Libro  # Importar la clase Libro para manejar persistencia
 import subprocess  # Para abrir main.py nuevamente
 
 class DeleteWindow:
-    def __init__(self, root, libro_manager):
+    def __init__(self, root):
         self.root = root
-        self.libro_manager = libro_manager
         self.root.title("Eliminar")
         self.root.geometry("470x360")
+
+        # Instancia de la clase Libro
+        self.libro_manager = Libro()
 
         # Colores y fuentes
         dark_blue = "#6c93a4"
@@ -65,6 +68,7 @@ class DeleteWindow:
     def delete_book(self):
         isbn = self.isbn_entry.get().strip()
         if isbn:
+            # Llama al método eliminar_libro de la clase Libro
             result = self.libro_manager.eliminar_libro(isbn)
             messagebox.showinfo("Resultado", result)
         else:
