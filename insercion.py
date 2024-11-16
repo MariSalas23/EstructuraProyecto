@@ -7,7 +7,7 @@ import subprocess
 class InsertWindow:
     def __init__(self, root):
         self.root = root
-        self.root.title("Agregar Libro")
+        self.root.title("Inserción")
         self.root.geometry("490x525")
 
         # Configuración de colores y fuentes

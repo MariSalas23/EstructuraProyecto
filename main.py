@@ -20,7 +20,7 @@ class MainInterface:
 
         # Configuración de la ventana principal
         self.window = tk.Tk()
-        self.window.title("Biblioteca")
+        self.window.title("Sistema de Gestión de Biblioteca")
         self.window.geometry("465x415")
         self.window.configure(background=self.dark_blue)
 
@@ -44,7 +44,7 @@ class MainInterface:
         content_frame.pack(fill="both", expand=True)
 
         # Título y subtítulo
-        title_label = tk.Label(content_frame, text="Biblioteca", font=title_font, background=self.white, foreground=self.blue)
+        title_label = tk.Label(content_frame, text="Biblioteca JMC", font=title_font, background=self.white, foreground=self.blue)
         title_label.pack(pady=10)
 
         subtitle_label = tk.Label(content_frame, text="¿Qué acción desea?", font=subtitle_font, background=self.white, foreground=self.blue)

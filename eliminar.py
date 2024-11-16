@@ -6,7 +6,7 @@ import subprocess  # Para abrir main.py nuevamente
 class DeleteWindow:
     def __init__(self, root):
         self.root = root
-        self.root.title("Eliminar")
+        self.root.title("Eliminación")
         self.root.geometry("470x360")
 
         # Instancia de la clase Libro
