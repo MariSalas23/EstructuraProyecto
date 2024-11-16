@@ -63,9 +63,9 @@ class DeleteWindow:
         if not isbn:
             messagebox.showerror("Error", "Debe ingresar un ISBN válido.")
             return
-        resultado = self.libro_instance.eliminarLibro(isbn)  # Usar la instancia de libro pasada
+        resultado = self.libro_instance.eliminarLibro(isbn)  
         messagebox.showinfo("Resultado", resultado)
 
     def regresar(self):
         self.root.destroy()
-        subprocess.Popen(["python", "main.py"])  # Abre la ventana principal
+        subprocess.Popen(["python", "main.py"]) 

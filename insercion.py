@@ -146,8 +146,4 @@ class InsertWindow:
 if __name__ == "__main__":
     root = tk.Tk()
     app = InsertWindow(root)
-<<<<<<< Updated upstream
     root.mainloop()
-=======
-    root.mainloop()
->>>>>>> Stashed changes
