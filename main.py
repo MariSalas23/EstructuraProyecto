@@ -1,8 +1,8 @@
 import tkinter as tk
-from tkinter import font
+from tkinter import font, messagebox
 from example import LibraryApp  # Importa LibraryApp desde el archivo example.py
 from insercion import InsertWindow
-from eliminar import DeleteWindow 
+from eliminar import DeleteWindow
 from libro import Libro
 
 class MainInterface:
@@ -14,9 +14,6 @@ class MainInterface:
         self.light_blue = "#b5ccd2"
         self.light_red = "#f5e2e4"
         self.white = "#ffffff"
-
-        # Crear la instancia de Libro
-        self.libro_instance = Libro()  # Instancia global de Libro
 
         # Configuración de la ventana principal
         self.window = tk.Tk()
@@ -73,20 +70,27 @@ class MainInterface:
         new_window.mainloop()
 
     def search_book(self):
+        # Cierra la ventana principal y abre la interfaz de búsqueda
         self.window.destroy()
         new_window = tk.Tk()
         LibraryApp(new_window)
         new_window.mainloop()
 
     def delete_book(self):
+        # Cierra la ventana principal y abre la interfaz de eliminación, pasando la instancia de libro
         self.window.destroy()
         new_window = tk.Tk()
-        # Pasa la instancia de libro a DeleteWindow
         DeleteWindow(new_window, self.libro_instance)
         new_window.mainloop()
 
     def view_books(self):
-        tk.messagebox.showinfo("Visualización", "Función de visualización de libros aquí")
+        # Muestra un mensaje con la lista de libros cargados
+        libros = self.libro_instance.listar_libros()
+        if libros:
+            libros_texto = "\n".join([f"{libro['titulo']} - {libro['autor']} ({libro['año_publicacion']})" for libro in libros])
+            messagebox.showinfo("Lista de Libros", libros_texto)
+        else:
+            messagebox.showinfo("Lista de Libros", "No hay libros registrados.")
 
     def run(self):
         self.window.mainloop()
