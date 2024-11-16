@@ -56,7 +56,6 @@ class Libro:
 
     def listar_libros(self):
         return list(self.library_data.values())
-<<<<<<< HEAD
 
     def eliminar_libro(self, isbn):
         if isbn in self.library_data:
@@ -64,5 +63,3 @@ class Libro:
             self.guardar_libros()  # Guarda los cambios en el archivo
             return f"El libro con ISBN {isbn} ha sido eliminado."
         return f"No se encontró ningún libro con ISBN {isbn}."
-=======
->>>>>>> 93c490c56abfc5332fbd715e7376faa63353c61c
