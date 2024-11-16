@@ -15,6 +15,13 @@ class Libro:
         else:
             return f"El libro con ISBN {isbn} ya existe."
 
+    def eliminarLibro(self, isbn):
+        if isbn in self.library_data:
+            libro_eliminado = self.library_data.pop(isbn)
+            return f"Libro '{libro_eliminado['titulo']}' eliminado correctamente."
+        else:
+            return f"No se encontró ningún libro con el ISBN {isbn}."
+
     def buscar_libro(self, criterio, valor):
         resultados = []
         for libro in self.library_data.values():

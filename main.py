@@ -2,7 +2,8 @@ import tkinter as tk
 from tkinter import font
 from example import LibraryApp  # Importa LibraryApp desde el archivo example.py
 from insercion import InsertWindow
-from eliminar import DeleteWindow  # Importa DeleteWindow desde eliminar.py
+from eliminar import DeleteWindow 
+from libro import Libro
 
 class MainInterface:
     def __init__(self):
@@ -13,6 +14,9 @@ class MainInterface:
         self.light_blue = "#b5ccd2"
         self.light_red = "#f5e2e4"
         self.white = "#ffffff"
+
+        # Crear la instancia de Libro
+        self.libro_instance = Libro()  # Instancia global de Libro
 
         # Configuración de la ventana principal
         self.window = tk.Tk()
@@ -77,7 +81,8 @@ class MainInterface:
     def delete_book(self):
         self.window.destroy()
         new_window = tk.Tk()
-        DeleteWindow(new_window)
+        # Pasa la instancia de libro a DeleteWindow
+        DeleteWindow(new_window, self.libro_instance)
         new_window.mainloop()
 
     def view_books(self):

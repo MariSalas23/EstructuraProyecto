@@ -1,12 +1,14 @@
 import tkinter as tk
 from tkinter import font, messagebox
 import subprocess
+from libro import Libro
 
 class DeleteWindow:
-    def __init__(self, root):
+    def __init__(self, root, libro_instance):
         self.root = root
         self.root.title("Eliminar Libro")
         self.root.geometry("400x320")
+        self.libro_instance = libro_instance
         
         # Configuración de colores y fuentes
         dark_blue = "#6c93a4"
@@ -58,8 +60,11 @@ class DeleteWindow:
 
     def eliminar_libro(self):
         isbn = self.isbn_entry.get()
-        # Lógica para eliminar el libro según ISBN (mensaje de confirmación como ejemplo)
-        messagebox.showinfo("Resultado", f"Libro con ISBN {isbn} eliminado.")
+        if not isbn:
+            messagebox.showerror("Error", "Debe ingresar un ISBN válido.")
+            return
+        resultado = self.libro_instance.eliminarLibro(isbn)  # Usar la instancia de libro pasada
+        messagebox.showinfo("Resultado", resultado)
 
     def regresar(self):
         self.root.destroy()
