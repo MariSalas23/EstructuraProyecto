@@ -43,12 +43,12 @@ class GenreTree:
         if not node.children:
             return node.value  # Nodo hoja: género encontrado
         
-        # mostrar mensajes
+        # Mostrar mensajes
         root = tk.Tk()
         root.withdraw()
-        # enumerar las opciones(los hijos de cada nodo)
+        # Enumerar las opciones (los hijos de cada nodo)
         options = {i+1: child.value for i, child in enumerate(node.children)}
-        # opciones en formato de lista
+        # Opciones en formato de lista
         options_text = "\n".join([f"{i}. {v}" for i, v in options.items()])
         choice = simpledialog.askinteger("Elección", f"{node.question}\n\n{options_text}")
 
@@ -63,6 +63,7 @@ class GenreTree:
     def find_genre(self):
         return self.guided_search(self.root)
 
-#crear el árbol para encontrar el género
-genre_tree = GenreTree()
-print("Género seleccionado:", genre_tree.find_genre())
+# Asegurarse de que este código solo se ejecute si el archivo se ejecuta directamente
+if __name__ == "__main__":
+    genre_tree = GenreTree()
+    print("Género seleccionado:", genre_tree.find_genre())
