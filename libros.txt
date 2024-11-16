@@ -1,11 +1,4 @@
 {
-    "1234567890111": {
-        "titulo": "hola",
-        "autor": "hola",
-        "genero": "Ensayo",
-        "fecha": 1,
-        "cantidad": 1
-    },
     "1234567890112": {
         "titulo": "hola",
         "autor": "hola",
