@@ -1,7 +1,7 @@
 from tkinter import font, ttk, simpledialog, messagebox
 import tkinter as tk
 from libro import Libro  # Importar la clase Libro desde libro.py
-from metodos import ordenamiento_burbuja, ordenamiento_insercion, ordenamiento_seleccion, merge_sort, busqueda_binaria
+from metodos import ordenamiento_burbuja, ordenamiento_insercion, ordenamiento_seleccion, merge_sort, busqueda_binaria, busqueda_lineal
 import subprocess  # Para manejar el regreso al menú principal
 
 
@@ -85,7 +85,7 @@ class LibraryApp:
         classify_label = tk.Label(filters_frame, text="Clasificar por:", font=label_font, bg=white, fg=blue)
         classify_label.pack(anchor="w", padx=10)
 
-        self.classify_combo = ttk.Combobox(filters_frame, values=["Título", "Año", "Autor", "Género"], state="readonly", font=label_font)
+        self.classify_combo = ttk.Combobox(filters_frame, values=["Título", "Año", "Autor", "Género", "ISBN"], state="readonly", font=label_font)
         self.classify_combo.set("Título")  # Selección por defecto: "Título"
         self.classify_combo.pack(fill="x", padx=10, pady=5)
 
@@ -111,7 +111,7 @@ class LibraryApp:
 
     def load_books(self):
         libros = self.libro_manager.listar_libros()
-        libros_ordenados = ordenamiento_burbuja(libros, key=lambda x: x["titulo"])
+        libros_ordenados = merge_sort(libros, key=lambda x: x["titulo"])
         self.book_list.delete(0, tk.END)
         for libro in libros_ordenados:
             self.book_list.insert(tk.END, f"{libro['titulo']} - {libro['autor']} ({libro['fecha']})")
@@ -119,45 +119,83 @@ class LibraryApp:
     def sort_asc(self):
         """Ordenar libros de menor a mayor según el campo seleccionado."""
         campo = self.classify_combo.get().lower()
-        libros = self.libro_manager.listar_libros()
+        valor = self.search_entry.get().strip().upper()
+        libros = self.libro_manager.listar_libros()  # Obtener todos los libros
 
-        # Seleccionar el método de ordenamiento según el campo
+        if valor:  # Si hay un valor en el input, aplicar búsqueda primero
+            libros = self.filter_books(libros, campo, valor)
+
+        # Ordenar solo los libros filtrados
         if campo == "año":
             libros_ordenados = merge_sort(libros, key=lambda x: int(x["fecha"]))
+        elif campo == "isbn":
+            libros_ordenados = merge_sort(libros, key=lambda x: x["isbn"])
         elif campo == "autor":
-            libros_ordenados = ordenamiento_insercion(libros, key=lambda x: x["autor"].lower())
+            libros_ordenados = ordenamiento_insercion(libros, key=lambda x: x["autor"])
         elif campo == "género":
-            libros_ordenados = ordenamiento_seleccion(libros, key=lambda x: x["genero"].lower())
-        else:
-            libros_ordenados = ordenamiento_burbuja(libros, key=lambda x: x["titulo"].lower())
+            libros_ordenados = ordenamiento_seleccion(libros, key=lambda x: x["genero"])
+        else:  # Por defecto, "Título"
+            libros_ordenados = ordenamiento_burbuja(libros, key=lambda x: x["titulo"])
 
-        # Mostrar libros ordenados
-        self.book_list.delete(0, tk.END)
-        for libro in libros_ordenados:
-            self.book_list.insert(tk.END, f"{libro['titulo']} - {libro['autor']} ({libro['fecha']})")
+        # Mostrar los libros ordenados
+        self.update_listbox(libros_ordenados)
 
     def sort_desc(self):
         """Ordenar libros de mayor a menor según el campo seleccionado."""
         campo = self.classify_combo.get().lower()
-        libros = self.libro_manager.listar_libros()
+        valor = self.search_entry.get().strip().upper()
+        libros = self.libro_manager.listar_libros()  # Obtener todos los libros
 
-        # Seleccionar el método de ordenamiento según el campo
+        if valor:  # Si hay un valor en el input, aplicar búsqueda primero
+            libros = self.filter_books(libros, campo, valor)
+
+        # Ordenar solo los libros filtrados
         if campo == "año":
             libros_ordenados = merge_sort(libros, key=lambda x: int(x["fecha"]))
+        elif campo == "isbn":
+            libros_ordenados = merge_sort(libros, key=lambda x: x["isbn"])
         elif campo == "autor":
-            libros_ordenados = ordenamiento_insercion(libros, key=lambda x: x["autor"].lower())
+            libros_ordenados = ordenamiento_insercion(libros, key=lambda x: x["autor"])
         elif campo == "género":
-            libros_ordenados = ordenamiento_seleccion(libros, key=lambda x: x["genero"].lower())
-        else:
-            libros_ordenados = ordenamiento_burbuja(libros, key=lambda x: x["titulo"].lower())
+            libros_ordenados = ordenamiento_seleccion(libros, key=lambda x: x["genero"])
+        else:  # Por defecto, "Título"
+            libros_ordenados = ordenamiento_burbuja(libros, key=lambda x: x["titulo"])
 
         # Invertir el orden para mayor a menor
         libros_ordenados.reverse()
 
-        # Mostrar libros ordenados
+        # Mostrar los libros ordenados
+        self.update_listbox(libros_ordenados)
+
+    def filter_books(self, libros, campo, valor):
+        """Filtrar libros según el campo y valor ingresado."""
+        campo_mapeado = {
+            "título": "titulo",
+            "año": "fecha",
+            "autor": "autor",
+            "género": "genero",
+            "isbn": "isbn"
+        }.get(campo)
+
+        if campo_mapeado == "fecha":  # Validar si el campo es año y convertir a entero
+            try:
+                valor = int(valor)
+            except ValueError:
+                messagebox.showerror("Error", "El valor ingresado para 'Año' debe ser numérico.")
+                return []
+
+        # Filtrar libros según el valor
+        return [
+            libro for libro in libros
+            if str(libro[campo_mapeado]).upper() == str(valor).upper()
+        ]
+
+    def update_listbox(self, libros):
+        """Actualizar el Listbox con una lista de libros."""
         self.book_list.delete(0, tk.END)
-        for libro in libros_ordenados:
+        for libro in libros:
             self.book_list.insert(tk.END, f"{libro['titulo']} - {libro['autor']} ({libro['fecha']})")
+
 
     def search_books(self):
         """Buscar libros según el campo seleccionado."""
@@ -171,7 +209,8 @@ class LibraryApp:
             "título": "titulo",
             "año": "fecha",
             "autor": "autor",
-            "género": "genero"
+            "género": "genero",
+            "isbn": "isbn"
         }.get(campo)
 
         if not campo_mapeado:
@@ -180,8 +219,10 @@ class LibraryApp:
 
         # Si el input está vacío, mostrar todos los libros ordenados según el filtro
         if not valor:
-            if campo_mapeado == "fecha":
+            if campo_mapeado == "fecha":  # Año
                 libros_ordenados = merge_sort(libros, key=lambda x: int(x["fecha"]))
+            elif campo_mapeado == "isbn":  # ISBN
+                libros_ordenados = merge_sort(libros, key=lambda x: x["isbn"])
             elif campo_mapeado == "autor":
                 libros_ordenados = ordenamiento_insercion(libros, key=lambda x: x["autor"])
             elif campo_mapeado == "genero":
@@ -195,38 +236,31 @@ class LibraryApp:
                 self.book_list.insert(tk.END, f"{libro['titulo']} - {libro['autor']} ({libro['fecha']})")
             return
 
-        # Si el input tiene un valor, realizar la búsqueda binaria
-        if campo_mapeado == "fecha":
-            try:
-                valor = int(valor)  # Convertir a entero para buscar por año
-                libros_ordenados = merge_sort(libros, key=lambda x: int(x["fecha"]))
-            except ValueError:
-                messagebox.showerror("Error", "El valor ingresado para 'Año' debe ser numérico.")
-                return
-        elif campo_mapeado == "autor":
-            libros_ordenados = ordenamiento_insercion(libros, key=lambda x: x["autor"])
-        elif campo_mapeado == "genero":
-            libros_ordenados = ordenamiento_seleccion(libros, key=lambda x: x["genero"])
-        elif campo_mapeado == "titulo":
-            libros_ordenados = ordenamiento_burbuja(libros, key=lambda x: x["titulo"])
-        else:
-            messagebox.showerror("Error", "El campo seleccionado no es válido para buscar.")
-            return
+        # Si el input tiene un valor, seleccionar el método de búsqueda
+        if campo_mapeado == "isbn":  # Para ISBN, usar búsqueda binaria
+            libros_ordenados = merge_sort(libros, key=lambda x: x["isbn"])  # Ordenar por ISBN como string
+            indice = busqueda_binaria(libros_ordenados, valor, key=lambda x: x["isbn"])
+            self.book_list.delete(0, tk.END)
+            if indice != -1:
+                libro = libros_ordenados[indice]
+                self.book_list.insert(tk.END, f"{libro['titulo']} - {libro['autor']} ({libro['fecha']})")
+            else:
+                self.book_list.insert(tk.END, "No se encontraron resultados.")
+        else:  # Para otros campos, usar búsqueda lineal
+            if campo_mapeado == "fecha":
+                try:
+                    valor = int(valor)  # Convertir a entero para buscar por año
+                except ValueError:
+                    messagebox.showerror("Error", "El valor ingresado para 'Año' debe ser numérico.")
+                    return
+            resultados = busqueda_lineal(libros, valor, key=lambda x: x[campo_mapeado])
+            self.book_list.delete(0, tk.END)
+            if resultados:
+                for libro in resultados:
+                    self.book_list.insert(tk.END, f"{libro['titulo']} - {libro['autor']} ({libro['fecha']})")
+            else:
+                self.book_list.insert(tk.END, "No se encontraron resultados.")
 
-        # Realizar la búsqueda binaria
-        try:
-            indice = busqueda_binaria(libros_ordenados, valor, key=lambda x: x[campo_mapeado])
-        except KeyError:
-            messagebox.showerror("Error", "El campo seleccionado no es válido para buscar.")
-            return
-
-        # Mostrar el resultado de la búsqueda
-        self.book_list.delete(0, tk.END)
-        if indice != -1:
-            libro = libros_ordenados[indice]
-            self.book_list.insert(tk.END, f"{libro['titulo']} - {libro['autor']} ({libro['fecha']})")
-        else:
-            self.book_list.insert(tk.END, "No se encontraron resultados.")
 
     def select_genre(self):
         """Filtrar libros por género seleccionado."""

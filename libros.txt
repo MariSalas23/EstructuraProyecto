@@ -10,10 +10,9 @@
         "titulo": "EJEMPLO",
         "autor": "JUANA",
         "genero": "HISTORIA",
-        "fecha": 2,
+        "fecha": 2002,
         "cantidad": 2
     },
-
     "9783161484100": {
         "titulo": "PRINCIPE CRUEL",
         "autor": "HOLLY BLACK",

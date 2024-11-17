@@ -1,5 +1,17 @@
 # Implementación de estructuras de datos y algoritmos en Python
 
+# Búsqueda Lineal (para múltiples coincidencias)
+def busqueda_lineal(lista, objetivo, key=lambda x: x):
+    """
+    Realiza una búsqueda lineal en una lista.
+    Devuelve una lista de elementos que coincidan con el objetivo.
+    """
+    resultados = []
+    for elemento in lista:
+        if key(elemento) == objetivo:
+            resultados.append(elemento)
+    return resultados
+
 # Búsqueda Binaria (requiere lista ordenada)
 # Realiza una búsqueda binaria en una lista ordenada.
 # Retorna el índice del elemento si se encuentra, o -1 si no se encuentra.
