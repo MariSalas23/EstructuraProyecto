@@ -5,6 +5,7 @@ import matplotlib.pyplot as plt
 from libro import Libro
 from n_ario import GenreTree
 from BalancedTree import BalancedTree
+from binary_tree import BinaryTree
 
 class Visualizar:
     def __init__(self, libro_manager):
@@ -122,7 +123,7 @@ class GraphInterface:
 
         # Crear los botones con mayor espacio entre ellos
         self.create_button(button_frame, "Grafo", lambda: self.mostrar_grafo(libro_manager), red, button_font, 0, 0)
-        self.create_button(button_frame, "Á. Binario", self.placeholder_action, blue, button_font, 0, 1)
+        self.create_button(button_frame, "Á. Binario", self.mostrar_arbol_binario, blue, button_font, 0, 1)
         self.create_button(button_frame, "Á. N-ario", self.mostrar_n_ario_texto, red, button_font, 0, 2)
         self.create_button(button_frame, "Á. AVL", self.mostrar_arbol_avl, blue, button_font, 0, 3)
         self.create_button(button_frame, "Regresar", self.regresar, red, button_font, 0, 4)
@@ -131,9 +132,11 @@ class GraphInterface:
         self.libro_manager = libro_manager
         self.genre_tree = GenreTree()  # Árbol N-ario
         self.avl_tree = BalancedTree()  # Árbol AVL
+        self.binary_tree = BinaryTree()  # Árbol binario de búsqueda
 
-        # Cargar libros en el árbol AVL
+        # Cargar libros en los árboles AVL y binario
         self._cargar_libros_avl()
+        self._cargar_libros_binario()
 
     def create_button(self, parent, text, command, color, font, row, column):
         """Crea un botón y lo posiciona en el grid."""
@@ -148,6 +151,12 @@ class GraphInterface:
         for libro in libros:
             self.avl_tree.insert(libro['fecha'])  # Inserta el año de publicación en el AVL
 
+    def _cargar_libros_binario(self):
+        """Carga los libros en el árbol binario de búsqueda, utilizando el título como clave."""
+        libros = self.libro_manager.listar_libros()
+        for libro in libros:
+            self.binary_tree.insert(libro['titulo'])  # Inserta el título en el árbol binario
+
     def mostrar_grafo(self, libro_manager):
         """Muestra el grafo al presionar el botón correspondiente."""
         visualizador = Visualizar(libro_manager)
@@ -155,7 +164,7 @@ class GraphInterface:
 
     def mostrar_n_ario_texto(self):
         """Muestra el árbol N-ario en formato gráfico en el área blanca."""
-        def build_tree_text(node, level=0, prefix="Género: "):
+        def build_tree_text(node, level=0, prefix="Root (Género): "):
             """Construye una representación textual del árbol N-ario con formato."""
             result = " " * (level * 4) + prefix + str(node.value) + "\n"
             for i, child in enumerate(node.children):
@@ -171,7 +180,7 @@ class GraphInterface:
 
     def mostrar_arbol_avl(self):
         """Muestra el árbol AVL en formato de texto."""
-        def build_avl_text(node, level=0, prefix="Root (Año):"):
+        def build_avl_text(node, level=0, prefix="Root (Año): "):
             """Construye una representación textual del árbol AVL con formato."""
             if not node:
                 return ""
@@ -189,9 +198,25 @@ class GraphInterface:
             avl_text = build_avl_text(self.avl_tree.root)
             self.display_text.insert(tk.END, avl_text)
 
-    def placeholder_action(self):
-        """Acción de marcador de posición para otros botones."""
-        messagebox.showinfo("Información", "Funcionalidad no implementada.")
+    def mostrar_arbol_binario(self):
+        """Muestra el árbol binario en formato de texto."""
+        def build_binary_text(node, level=0, prefix="Root (Título): "):
+            """Construye una representación textual del árbol binario con formato."""
+            if not node:
+                return ""
+            result = " " * (level * 4) + prefix + f"{node.value}\n"
+            result += build_binary_text(node.left, level + 1, "L── ")
+            result += build_binary_text(node.right, level + 1, "R── ")
+            return result
+
+        # Limpiar el área de texto
+        self.display_text.delete(1.0, tk.END)
+        # Construir y mostrar el árbol binario
+        if not self.binary_tree.root:
+            self.display_text.insert(tk.END, "El árbol binario está vacío.\n")
+        else:
+            binary_text = build_binary_text(self.binary_tree.root)
+            self.display_text.insert(tk.END, binary_text)
 
     def regresar(self):
         """Cierra la ventana actual y regresa al menú principal."""
