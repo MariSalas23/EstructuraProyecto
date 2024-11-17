@@ -114,7 +114,7 @@ class LibraryApp:
         libros_ordenados = merge_sort(libros, key=lambda x: x["titulo"])
         self.book_list.delete(0, tk.END)
         for libro in libros_ordenados:
-            self.book_list.insert(tk.END, f"{libro['titulo']} - {libro['autor']} ({libro['fecha']})")
+            self.book_list.insert(tk.END, f"{libro['titulo']} - {libro['autor']} ({libro['fecha']})  |  {libro['genero']}  |  ISBN: {libro['isbn']}  |  Cantidad: {libro['cantidad']}")
 
     def sort_asc(self):
         """Ordenar libros de menor a mayor según el campo seleccionado."""
@@ -194,7 +194,7 @@ class LibraryApp:
         """Actualizar el Listbox con una lista de libros."""
         self.book_list.delete(0, tk.END)
         for libro in libros:
-            self.book_list.insert(tk.END, f"{libro['titulo']} - {libro['autor']} ({libro['fecha']})")
+            self.book_list.insert(tk.END, f"{libro['titulo']} - {libro['autor']} ({libro['fecha']})  |  {libro['genero']}  |  ISBN: {libro['isbn']}  |  Cantidad: {libro['cantidad']}")
 
 
     def search_books(self):
@@ -233,7 +233,7 @@ class LibraryApp:
             # Mostrar todos los libros ordenados
             self.book_list.delete(0, tk.END)
             for libro in libros_ordenados:
-                self.book_list.insert(tk.END, f"{libro['titulo']} - {libro['autor']} ({libro['fecha']})")
+                self.book_list.insert(tk.END, f"{libro['titulo']} - {libro['autor']} ({libro['fecha']})  |  {libro['genero']}  |  ISBN: {libro['isbn']}  |  Cantidad: {libro['cantidad']}")
             return
 
         # Si el input tiene un valor, seleccionar el método de búsqueda
@@ -243,7 +243,7 @@ class LibraryApp:
             self.book_list.delete(0, tk.END)
             if indice != -1:
                 libro = libros_ordenados[indice]
-                self.book_list.insert(tk.END, f"{libro['titulo']} - {libro['autor']} ({libro['fecha']})")
+                self.book_list.insert(tk.END, f"{libro['titulo']} - {libro['autor']} ({libro['fecha']})  |  {libro['genero']}  |  ISBN: {libro['isbn']}  |  Cantidad: {libro['cantidad']}")
             else:
                 self.book_list.insert(tk.END, "No se encontraron resultados.")
         else:  # Para otros campos, usar búsqueda lineal
@@ -257,7 +257,7 @@ class LibraryApp:
             self.book_list.delete(0, tk.END)
             if resultados:
                 for libro in resultados:
-                    self.book_list.insert(tk.END, f"{libro['titulo']} - {libro['autor']} ({libro['fecha']})")
+                    self.book_list.insert(tk.END, f"{libro['titulo']} - {libro['autor']} ({libro['fecha']})  |  {libro['genero']}  |  ISBN: {libro['isbn']}  |  Cantidad: {libro['cantidad']}")
             else:
                 self.book_list.insert(tk.END, "No se encontraron resultados.")
 
@@ -271,7 +271,7 @@ class LibraryApp:
             libros = [libro for libro in self.libro_manager.listar_libros() if libro["genero"] == selected_genre]
             self.book_list.delete(0, tk.END)
             for libro in libros:
-                self.book_list.insert(tk.END, f"{libro['titulo']} - {libro['autor']} ({libro['fecha']})")
+                self.book_list.insert(tk.END, f"{libro['titulo']} - {libro['autor']} ({libro['fecha']})  |  {libro['genero']}  |  ISBN: {libro['isbn']}  |  Cantidad: {libro['cantidad']}")
         else:
             messagebox.showwarning("Género no válido", "El género ingresado no es válido.")
 
