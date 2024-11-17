@@ -12,5 +12,27 @@
         "genero": "HISTORIA",
         "fecha": 2,
         "cantidad": 2
+    },
+
+    "9783161484100": {
+        "titulo": "PRINCIPE CRUEL",
+        "autor": "HOLLY BLACK",
+        "genero": "FANTAS\u00cdA",
+        "fecha": 2019,
+        "cantidad": 2
+    },
+    "9780123456789": {
+        "titulo": "EL REY MALVADO",
+        "autor": "HOLLY BLACK",
+        "genero": "ROMANCE",
+        "fecha": 2020,
+        "cantidad": 2
+    },
+    "9781234567897": {
+        "titulo": "LA REINA DE NADA",
+        "autor": "HOLLY BLACK",
+        "genero": "FANTAS\u00cdA",
+        "fecha": 2020,
+        "cantidad": 1
     }
 }
