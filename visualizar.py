@@ -4,6 +4,7 @@ import networkx as nx
 import matplotlib.pyplot as plt
 from libro import Libro
 from n_ario import GenreTree
+from BalancedTree import BalancedTree
 
 class Visualizar:
     def __init__(self, libro_manager):
@@ -121,13 +122,18 @@ class GraphInterface:
 
         # Crear los botones con mayor espacio entre ellos
         self.create_button(button_frame, "Grafo", lambda: self.mostrar_grafo(libro_manager), red, button_font, 0, 0)
-        self.create_button(button_frame, "A. Binario", self.placeholder_action, blue, button_font, 0, 1)
-        self.create_button(button_frame, "A. N-ario", self.mostrar_n_ario_texto, red, button_font, 0, 2)
-        self.create_button(button_frame, "A. AVL", self.placeholder_action, blue, button_font, 0, 3)
+        self.create_button(button_frame, "Á. Binario", self.placeholder_action, blue, button_font, 0, 1)
+        self.create_button(button_frame, "Á. N-ario", self.mostrar_n_ario_texto, red, button_font, 0, 2)
+        self.create_button(button_frame, "Á. AVL", self.mostrar_arbol_avl, blue, button_font, 0, 3)
         self.create_button(button_frame, "Regresar", self.regresar, red, button_font, 0, 4)
 
-        # Cargar el árbol N-ario
-        self.genre_tree = GenreTree()
+        # Instancias necesarias
+        self.libro_manager = libro_manager
+        self.genre_tree = GenreTree()  # Árbol N-ario
+        self.avl_tree = BalancedTree()  # Árbol AVL
+
+        # Cargar libros en el árbol AVL
+        self._cargar_libros_avl()
 
     def create_button(self, parent, text, command, color, font, row, column):
         """Crea un botón y lo posiciona en el grid."""
@@ -135,6 +141,12 @@ class GraphInterface:
             parent, text=text, command=command, bg=color, fg="white", font=font, width=14, height=2, relief=tk.FLAT
         )
         button.grid(row=row, column=column, padx=15, pady=10)  # Espacio entre botones
+
+    def _cargar_libros_avl(self):
+        """Carga los libros en el árbol AVL, utilizando el año de publicación como clave."""
+        libros = self.libro_manager.listar_libros()
+        for libro in libros:
+            self.avl_tree.insert(libro['fecha'])  # Inserta el año de publicación en el AVL
 
     def mostrar_grafo(self, libro_manager):
         """Muestra el grafo al presionar el botón correspondiente."""
@@ -156,6 +168,26 @@ class GraphInterface:
         # Construir y mostrar el árbol
         tree_text = build_tree_text(self.genre_tree.root)
         self.display_text.insert(tk.END, tree_text)
+
+    def mostrar_arbol_avl(self):
+        """Muestra el árbol AVL en formato de texto."""
+        def build_avl_text(node, level=0, prefix="Root (Año):"):
+            """Construye una representación textual del árbol AVL con formato."""
+            if not node:
+                return ""
+            result = " " * (level * 4) + prefix + f"{node.value}\n"
+            result += build_avl_text(node.left, level + 1, "L── ")
+            result += build_avl_text(node.right, level + 1, "R── ")
+            return result
+
+        # Limpiar el área de texto
+        self.display_text.delete(1.0, tk.END)
+        # Construir y mostrar el árbol AVL
+        if not self.avl_tree.root:
+            self.display_text.insert(tk.END, "El árbol AVL está vacío.\n")
+        else:
+            avl_text = build_avl_text(self.avl_tree.root)
+            self.display_text.insert(tk.END, avl_text)
 
     def placeholder_action(self):
         """Acción de marcador de posición para otros botones."""
