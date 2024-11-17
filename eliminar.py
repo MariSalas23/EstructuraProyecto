@@ -68,15 +68,59 @@ class DeleteWindow:
     def delete_book(self):
         isbn = self.isbn_entry.get().strip()
         if isbn:
-            # Llama al método eliminar_libro de la clase Libro
-            result = self.libro_manager.eliminar_libro(isbn)
+            # Verificar si el libro existe
+            libro_existente = self.libro_manager.library_data.get(isbn)
+            if not libro_existente:
+                messagebox.showwarning("Resultado", "No se encontró un libro con el ISBN proporcionado.")
+                return
 
-            # Comprobar si la eliminación fue exitosa
-            if "eliminado correctamente" in result.lower():
-                messagebox.showinfo("Resultado", result)
-                self.isbn_entry.delete(0, tk.END)  # Limpia el campo de entrada si la eliminación fue exitosa
+            # Si la cantidad es mayor a 1, preguntar cuántos ejemplares eliminar
+            cantidad_actual = libro_existente["cantidad"]
+            if cantidad_actual > 1:
+                while True:
+                    cantidad_a_eliminar = tk.simpledialog.askstring(
+                        "Eliminar ejemplares",
+                        f"El libro '{libro_existente['titulo']}' tiene {cantidad_actual} ejemplares.\n"
+                        "¿Cuántos desea eliminar?",
+                    )
+                    if cantidad_a_eliminar is None:  # Si se cancela la operación
+                        return
+                    try:
+                        cantidad_a_eliminar = int(cantidad_a_eliminar)
+                        if cantidad_a_eliminar <= 0:
+                            raise ValueError("La cantidad debe ser mayor a 0.")
+                        if cantidad_a_eliminar > cantidad_actual:
+                            raise ValueError("La cantidad a eliminar no puede exceder la cantidad existente.")
+                        break  # Salir del bucle si todo es válido
+                    except ValueError as e:
+                        messagebox.showerror("Error", str(e))
+
+                # Actualizar la cantidad restante
+                nueva_cantidad = cantidad_actual - cantidad_a_eliminar
+                self.libro_manager.library_data[isbn]["cantidad"] = nueva_cantidad
+                self.libro_manager.guardar_libros()
+                if nueva_cantidad > 0:
+                    messagebox.showinfo(
+                        "Resultado",
+                        f"Se eliminaron {cantidad_a_eliminar} ejemplar(es) de '{libro_existente['titulo']}'.\n"
+                        f"Cantidad restante: {nueva_cantidad}.",
+                    )
+                    self.isbn_entry.delete(0, tk.END)
+                else:
+                    # Si la cantidad restante es 0, eliminar el libro del sistema
+                    del self.libro_manager.library_data[isbn]
+                    self.libro_manager.guardar_libros()
+                    messagebox.showinfo("Resultado", f"Se eliminaron todos los ejemplares de '{libro_existente['titulo']}'.")
+                    self.isbn_entry.delete(0, tk.END)
+
             else:
-                messagebox.showwarning("Resultado", result)  # Muestra un aviso si el libro no se encuentra
+                # Si la cantidad es 1, eliminar el libro directamente
+                result = self.libro_manager.eliminar_libro(isbn)
+                if "eliminado correctamente" in result.lower():
+                    messagebox.showinfo("Resultado", result)
+                    self.isbn_entry.delete(0, tk.END)  # Limpia el campo de entrada si la eliminación fue exitosa
+                else:
+                    messagebox.showwarning("Resultado", result)  # Muestra un aviso si el libro no se encuentra
         else:
             messagebox.showerror("Error", "Por favor, ingrese un ISBN válido.")
 

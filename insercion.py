@@ -107,7 +107,6 @@ class InsertWindow:
             if len(isbn) not in [10, 13]:
                 raise ValueError("El ISBN debe contener exactamente 10 o 13 dígitos.")
 
-
             # Validar año de publicación
             if año_publicacion < 0 or año_publicacion > 2024:
                 raise ValueError("El año de publicación debe estar entre 0 y 2024.")
@@ -116,10 +115,32 @@ class InsertWindow:
             if cantidad < 0:
                 raise ValueError("La cantidad no puede ser un número negativo.")
 
-            # Guardar libro en el archivo
+            # Verificar si el ISBN ya existe
+            libro_existente = self.libro_manager.library_data.get(isbn)
+            if libro_existente:
+                # Si el ISBN ya existe, preguntar si desea aumentar la cantidad
+                titulo_existente = libro_existente["titulo"]
+                respuesta = messagebox.askokcancel(
+                    "ISBN existente",
+                    f"Ese ISBN ya existe, ¿desea aumentar la cantidad de ejemplares de \"{titulo_existente}\"?"
+                )
+                if respuesta:  # Si el usuario confirma, sumar las cantidades
+                    nueva_cantidad = libro_existente["cantidad"] + cantidad
+                    self.libro_manager.library_data[isbn]["cantidad"] = nueva_cantidad
+                    self.libro_manager.guardar_libros()
+                    messagebox.showinfo(
+                        "Cantidad actualizada",
+                        f"La cantidad de ejemplares de \"{titulo_existente}\" ahora es {nueva_cantidad}."
+                    )
+                    for field in self.entries.values():
+                        field.delete(0, tk.END)
+                        self.selected_genre.set("Género seleccionado: Ninguno")
+                return
+
+            # Si el ISBN no existe, agregar el nuevo libro
             mensaje = self.libro_manager.agregar_libro(isbn, titulo, autor, genero, año_publicacion, cantidad)
 
-            # Si se agrega exitosamente, mostrar mensaje y limpiar campos
+            # Mostrar mensaje de éxito
             messagebox.showinfo("Resultado", mensaje)
 
             # Limpiar los campos solo si se agrega correctamente
