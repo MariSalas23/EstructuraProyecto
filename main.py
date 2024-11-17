@@ -1,10 +1,11 @@
 import tkinter as tk
 from tkinter import font, messagebox
-from example import LibraryApp  # Importa LibraryApp desde el archivo example.py
+from example import LibraryApp  # Importar LibraryApp
 from insercion import InsertWindow
 from eliminar import DeleteWindow
 from libro import Libro
-from visualizar import Visualizar  # Importa la clase Visualizar
+from visualizar import GraphInterface  # Importar la nueva interfaz de grafo
+
 
 class MainInterface:
     def __init__(self):
@@ -59,46 +60,53 @@ class MainInterface:
         self.create_button(button_frame, "Inserción", self.open_insert_window, self.red, button_font, 0, 0)
         self.create_button(button_frame, "Búsqueda", self.search_book, self.blue, button_font, 0, 1)
         self.create_button(button_frame, "Eliminación", self.delete_book, self.blue, button_font, 1, 0)
-        self.create_button(button_frame, "Visualización", self.view_books, self.red, button_font, 1, 1)
+        self.create_button(button_frame, "Visualización", self.open_graph_interface, self.red, button_font, 1, 1)
 
     def create_button(self, parent, text, command, color, font, row, column):
+        """Crea botones con estilos consistentes."""
         button = tk.Button(parent, text=text, command=command, bg=color, fg="white",
                            font=font, width=12, height=2, relief=tk.FLAT)
         button.grid(row=row, column=column, padx=10, pady=10)
 
     def open_insert_window(self):
-        # Cierra la ventana principal y abre la interfaz de inserción en una nueva ventana
+        """Abrir ventana de inserción."""
         self.window.destroy()
         new_window = tk.Tk()
         InsertWindow(new_window)
         new_window.mainloop()
 
     def search_book(self):
-        # Cierra la ventana principal y abre la interfaz de búsqueda
+        """Abrir ventana de búsqueda."""
         self.window.destroy()
         new_window = tk.Tk()
         LibraryApp(new_window)
         new_window.mainloop()
 
     def delete_book(self):
-        # Cierra la ventana principal y abre la interfaz de eliminación, pasando la instancia de libro
+        """Abrir ventana de eliminación."""
         self.window.destroy()
         new_window = tk.Tk()
         DeleteWindow(new_window)
         new_window.mainloop()
 
+    def open_graph_interface(self):
+        """Abrir la interfaz de grafo."""
+        self.window.destroy()
+        new_window = tk.Tk()
+        GraphInterface(new_window, self.libro_instance)  # Pasar la instancia de libros a la interfaz
+        new_window.mainloop()
+
     def view_books(self):
-        # Muestra un mensaje con la lista de libros cargados
+        """Visualizar libros en una lista o grafo."""
         libros = self.libro_instance.listar_libros()
         if libros:
             libros_texto = "\n".join([f"{libro['titulo']} - {libro['autor']} ({libro['fecha']})" for libro in libros])
             messagebox.showinfo("Lista de Libros", libros_texto)
         else:
             messagebox.showinfo("Lista de Libros", "No hay libros registrados.")
-        visualizacion = Visualizar(self.libro_instance)  # Crear una instancia de Visualizar
-        visualizacion.mostrar_grafo(self.window)  # Pasar la ventana principal como argumento
 
     def run(self):
+        """Ejecutar la interfaz."""
         self.window.mainloop()
 
 if __name__ == "__main__":
