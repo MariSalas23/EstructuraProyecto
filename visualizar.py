@@ -178,31 +178,43 @@ class GraphInterface:
         tree_text = build_tree_text(self.genre_tree.root)
         self.display_text.insert(tk.END, tree_text)
 
-    def mostrar_arbol(self, tree, root_label="Root: "):
-        """Muestra un árbol en formato de texto."""
-        def build_tree_text(node, level=0, prefix=root_label):
-            """Construye una representación textual del árbol con formato."""
+    def mostrar_arbol_avl(self):
+        """Muestra el árbol AVL en formato de texto."""
+        def build_avl_text(node, level=0, prefix="Root (Año):"):
+            """Construye una representación textual del árbol AVL con formato."""
             if not node:
                 return ""
             result = " " * (level * 4) + prefix + f"{node.value}\n"
-            result += build_tree_text(node.left, level + 1, "L── ")
-            result += build_tree_text(node.right, level + 1, "R── ")
+            result += build_avl_text(node.left, level + 1, "L── ")
+            result += build_avl_text(node.right, level + 1, "R── ")
             return result
-
-        # Limpiar el área de texto
+                # Limpiar el área de texto
         self.display_text.delete(1.0, tk.END)
-        # Construir y mostrar el árbol
-        if not tree.root:
-            self.display_text.insert(tk.END, "El árbol está vacío.\n")
+        # Construir y mostrar el árbol AVL
+        if not self.avl_tree.root:
+            self.display_text.insert(tk.END, "El árbol AVL está vacío.\n")
         else:
-            tree_text = build_tree_text(tree.root)
-            self.display_text.insert(tk.END, tree_text)
-
-    def mostrar_arbol_avl(self):
-        self.mostrar_arbol(self.avl_tree, root_label="Root (Año): ")
+            avl_text = build_avl_text(self.avl_tree.root)
+            self.display_text.insert(tk.END, avl_text)
 
     def mostrar_arbol_binario(self):
-        self.mostrar_arbol(self.binary_tree, root_label="Root (Título): ")
+        """Muestra el árbol binario en formato de texto."""
+        def build_binary_text(node, level=0, prefix="Root (Título): "):
+            """Construye una representación textual del árbol binario con formato."""
+            if not node:
+                return ""
+            result = " " * (level * 4) + prefix + f"{node.value}\n"
+            result += build_binary_text(node.left, level + 1, "L── ")
+            result += build_binary_text(node.right, level + 1, "R── ")
+            return result
+        # Limpiar el área de texto
+        self.display_text.delete(1.0, tk.END)
+        # Construir y mostrar el árbol binario
+        if not self.binary_tree.root:
+            self.display_text.insert(tk.END, "El árbol binario está vacío.\n")
+        else:
+            binary_text = build_binary_text(self.binary_tree.root)
+            self.display_text.insert(tk.END, binary_text)
 
     def regresar(self):
         """Cierra la ventana actual y regresa al menú principal."""

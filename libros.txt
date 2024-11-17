@@ -3,35 +3,42 @@
         "titulo": "HOLA",
         "autor": "PEPITO PEREZ",
         "genero": "HISTORIA",
-        "fecha": 20,
+        "fecha": 2020,
         "cantidad": 1
     },
     "9783161484100": {
         "titulo": "PRINCIPE CRUEL",
         "autor": "HOLLY BLACK",
         "genero": "FANTAS\u00cdA",
-        "fecha": 2019,
+        "fecha": 2010,
         "cantidad": 2
     },
     "9780123456789": {
         "titulo": "EL REY MALVADO",
         "autor": "HOLLY BLACK",
         "genero": "ROMANCE",
-        "fecha": 40,
+        "fecha": 2015,
         "cantidad": 2
     },
     "9781234567897": {
         "titulo": "LA REINA DE NADA",
         "autor": "HOLLY BLACK",
         "genero": "FANTAS\u00cdA",
-        "fecha": 2020,
+        "fecha": 2000,
         "cantidad": 1
     },
     "1234567890001": {
-        "titulo": "LA RAZON DE ESTAR CONTIGO: LA PROMESA",
-        "autor": "W. BRUCE CAMERON",
+        "titulo": "EJEMPLO",
+        "autor": "ANONIMO",
         "genero": "FANTAS\u00cdA",
-        "fecha": 2020,
+        "fecha": 2005,
         "cantidad": 4
+    },
+    "1235678901221": {
+        "titulo": "BALANCEADO",
+        "autor": "ANONIMO",
+        "genero": "POES\u00cdA CONTEMPLATIVA",
+        "fecha": 2003,
+        "cantidad": 1
     }
 }
