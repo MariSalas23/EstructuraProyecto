@@ -6,7 +6,6 @@ from eliminar import DeleteWindow
 from libro import Libro
 from visualizar import GraphInterface  # Importar la nueva interfaz de grafo
 
-
 class MainInterface:
     def __init__(self):
         # Configuración de colores

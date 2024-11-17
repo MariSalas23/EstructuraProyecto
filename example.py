@@ -4,21 +4,23 @@ from libro import Libro  # Importar la clase Libro desde libro.py
 from metodos import ordenamiento_burbuja, ordenamiento_insercion, ordenamiento_seleccion, merge_sort, busqueda_binaria, busqueda_lineal
 import subprocess  # Para manejar el regreso al menú principal
 
+
 class LibraryApp:
     def __init__(self, root):
         self.root = root
         self.root.title("Búsqueda")
 
         # Configurar ventana para pantalla completa
-        self.root.state('zoomed')  # Configurar ventana en modo maximizado (pantalla completa)
+        self.root.state('zoomed')
 
         # Crear instancia de Libro
-        self.libro_manager = Libro()  # Objeto para gestionar libros
+        self.libro_manager = Libro()
 
         # Configuración de colores y fuentes
         dark_blue = "#6c93a4"
         red = "#ef6869"
         blue = "#2f4f74"
+        self.blue = blue
         light_blue = "#b5ccd2"
         white = "#ffffff"
         title_font = font.Font(family="Open Sans", size=16, weight="bold")
@@ -48,7 +50,7 @@ class LibraryApp:
         search_frame = tk.Frame(search_frame_border, background=white, padx=10, pady=10)
         search_frame.pack(fill="x")
 
-        search_label = tk.Label(search_frame, text="Buscar libros:", font=label_font, bg=white, fg=blue)
+        search_label = tk.Label(search_frame, text="Buscar libros:", font=("Open Sans", 12, "bold"), bg=white, fg=blue)
         search_label.pack(side="left", padx=5)
 
         self.search_entry = tk.Entry(search_frame, font=label_font, width=40)
@@ -64,8 +66,10 @@ class LibraryApp:
         book_list_frame = tk.Frame(book_list_frame_border, background=white, padx=10, pady=10)
         book_list_frame.pack(fill="both", expand=True)
 
-        self.book_list = tk.Listbox(book_list_frame, width=60, height=20, bg=light_blue, font=label_font)
+        # Cambiar Listbox por Text para usar estilos
+        self.book_list = tk.Text(book_list_frame, wrap="word", bg=light_blue, font=label_font)
         self.book_list.pack(side="left", fill="both", expand=True)
+        self.setup_text_widget_styles()
 
         scrollbar = ttk.Scrollbar(book_list_frame, orient="vertical", command=self.book_list.yview)
         scrollbar.pack(side="right", fill="y")
@@ -88,13 +92,11 @@ class LibraryApp:
         self.classify_combo.set("Título")  # Selección por defecto: "Título"
         self.classify_combo.pack(fill="x", padx=10, pady=5)
 
-        # Asociar evento al Combobox para habilitar/inhiblar el botón según el filtro
         self.classify_combo.bind("<<ComboboxSelected>>", self.update_genre_button_state)
 
-        # Configurar el botón "Seleccionar Género" e inhabilitarlo por defecto
         self.genre_button = tk.Button(filters_frame, text="Seleccionar Género", command=self.select_genre, bg=blue, fg="white", font=button_font, relief=tk.FLAT)
         self.genre_button.pack(fill="x", padx=10, pady=(20, 20))
-        self.genre_button.config(state="disabled")  # Inhabilitar por defecto
+        self.genre_button.config(state="disabled")
 
         asc_button = tk.Button(filters_frame, text="Menor a Mayor", command=self.sort_asc, bg=red, fg="white", font=button_font, relief=tk.FLAT)
         asc_button.pack(fill="x", padx=10, pady=8)
@@ -105,66 +107,119 @@ class LibraryApp:
         regresar_button = tk.Button(filters_frame, text="Regresar", command=self.regresar, bg=blue, fg="white", font=button_font, relief=tk.FLAT)
         regresar_button.pack(fill="x", padx=10, pady=20)
 
-        # Cargar y mostrar libros al inicializar
         self.load_books()
 
+    def setup_text_widget_styles(self):
+        """Configura los estilos del Text widget."""
+        self.book_list.tag_configure("title", font=("Open Sans", 12, "bold"), foreground=self.blue)
+        self.book_list.tag_configure("bold", font=("Open Sans", 10, "bold"))
+
+    def insert_book_in_listbox(self, libro):
+        """Inserta un libro en el Text widget con formato y estilos personalizados."""
+        padding = "   "  # Espaciado al inicio de cada línea
+        self.book_list.insert(tk.END, "\n")
+        self.book_list.insert(tk.END, f"{padding}{libro['titulo']} - {libro['autor']} ({libro['fecha']})\n", "title")
+        self.book_list.insert(tk.END, f"{padding}Género: ", "bold")
+        self.book_list.insert(tk.END, f"{libro['genero']}\n")
+        self.book_list.insert(tk.END, f"{padding}ISBN: ", "bold")
+        self.book_list.insert(tk.END, f"{libro['isbn']}\n")
+        self.book_list.insert(tk.END, f"{padding}Cantidad: ", "bold")
+        self.book_list.insert(tk.END, f"{libro['cantidad']}\n")
+
     def load_books(self):
+        """Cargar libros y mostrarlos en el Text widget."""
         libros = self.libro_manager.listar_libros()
         libros_ordenados = merge_sort(libros, key=lambda x: x["titulo"])
-        self.book_list.delete(0, tk.END)
+        self.book_list.delete("1.0", tk.END)
         for libro in libros_ordenados:
             self.insert_book_in_listbox(libro)
 
-    def sort_asc(self):
-        """Ordenar libros de menor a mayor según el campo seleccionado."""
+    def search_books(self):
+        """Buscar libros según el campo seleccionado."""
         campo = self.classify_combo.get().lower()
         valor = self.search_entry.get().strip().upper()
-        libros = self.libro_manager.listar_libros()  # Obtener todos los libros
 
-        if valor:  # Si hay un valor en el input, aplicar búsqueda primero
-            libros = self.filter_books(libros, campo, valor)
+        libros = self.libro_manager.listar_libros()
 
-        # Ordenar solo los libros filtrados
+        campo_mapeado = {
+            "título": "titulo",
+            "año": "fecha",
+            "autor": "autor",
+            "género": "genero",
+            "isbn": "isbn"
+        }.get(campo)
+
+        if not valor:
+            self.load_books()  # Si no hay valor, recargar todos los libros
+            self.resultados_busqueda = []  # Limpiar resultados previos
+            return
+
+        # Filtrar libros según el campo y valor ingresado
+        resultados = [libro for libro in libros if valor in str(libro[campo_mapeado]).upper()]
+        
+        # Mostrar los resultados encontrados en el Text widget
+        self.book_list.delete("1.0", tk.END)
+        if resultados:
+            for libro in resultados:
+                self.insert_book_in_listbox(libro)
+        else:
+            self.book_list.insert(tk.END, "No se encontraron resultados.")
+        
+        # Guardar los resultados de la búsqueda para que se puedan ordenar después
+        self.resultados_busqueda = resultados
+
+    def sort_asc(self):
+        """Ordenar libros de menor a mayor según el campo seleccionado, sin borrar resultados."""
+        campo = self.classify_combo.get().lower()
+
+        if not hasattr(self, 'resultados_busqueda') or not self.resultados_busqueda:
+            self.resultados_busqueda = self.libro_manager.listar_libros()  # Si no se ha realizado búsqueda previa o no hay resultados
+
+        # Ordenar la lista de libros
         if campo == "año":
-            libros_ordenados = merge_sort(libros, key=lambda x: int(x["fecha"]))
+            libros_ordenados = merge_sort(self.resultados_busqueda, key=lambda x: int(x["fecha"]))
         elif campo == "isbn":
-            libros_ordenados = merge_sort(libros, key=lambda x: x["isbn"])
+            libros_ordenados = merge_sort(self.resultados_busqueda, key=lambda x: x["isbn"])
         elif campo == "autor":
-            libros_ordenados = ordenamiento_insercion(libros, key=lambda x: x["autor"])
+            libros_ordenados = ordenamiento_insercion(self.resultados_busqueda, key=lambda x: x["autor"])
         elif campo == "género":
-            libros_ordenados = ordenamiento_seleccion(libros, key=lambda x: x["genero"])
+            libros_ordenados = ordenamiento_seleccion(self.resultados_busqueda, key=lambda x: x["genero"])
         else:  # Por defecto, "Título"
-            libros_ordenados = ordenamiento_burbuja(libros, key=lambda x: x["titulo"])
+            libros_ordenados = ordenamiento_burbuja(self.resultados_busqueda, key=lambda x: x["titulo"])
 
         # Mostrar los libros ordenados
         self.update_listbox(libros_ordenados)
 
     def sort_desc(self):
-        """Ordenar libros de mayor a menor según el campo seleccionado."""
+        """Ordenar libros de mayor a menor según el campo seleccionado, sin borrar resultados."""
         campo = self.classify_combo.get().lower()
-        valor = self.search_entry.get().strip().upper()
-        libros = self.libro_manager.listar_libros()  # Obtener todos los libros
 
-        if valor:  # Si hay un valor en el input, aplicar búsqueda primero
-            libros = self.filter_books(libros, campo, valor)
+        if not hasattr(self, 'resultados_busqueda') or not self.resultados_busqueda:
+            self.resultados_busqueda = self.libro_manager.listar_libros()  # Si no se ha realizado búsqueda previa o no hay resultados
 
-        # Ordenar solo los libros filtrados
+        # Ordenar la lista de libros
         if campo == "año":
-            libros_ordenados = merge_sort(libros, key=lambda x: int(x["fecha"]))
+            libros_ordenados = merge_sort(self.resultados_busqueda, key=lambda x: int(x["fecha"]))
         elif campo == "isbn":
-            libros_ordenados = merge_sort(libros, key=lambda x: x["isbn"])
+            libros_ordenados = merge_sort(self.resultados_busqueda, key=lambda x: x["isbn"])
         elif campo == "autor":
-            libros_ordenados = ordenamiento_insercion(libros, key=lambda x: x["autor"])
+            libros_ordenados = ordenamiento_insercion(self.resultados_busqueda, key=lambda x: x["autor"])
         elif campo == "género":
-            libros_ordenados = ordenamiento_seleccion(libros, key=lambda x: x["genero"])
+            libros_ordenados = ordenamiento_seleccion(self.resultados_busqueda, key=lambda x: x["genero"])
         else:  # Por defecto, "Título"
-            libros_ordenados = ordenamiento_burbuja(libros, key=lambda x: x["titulo"])
+            libros_ordenados = ordenamiento_burbuja(self.resultados_busqueda, key=lambda x: x["titulo"])
 
         # Invertir el orden para mayor a menor
         libros_ordenados.reverse()
 
         # Mostrar los libros ordenados
         self.update_listbox(libros_ordenados)
+
+    def update_listbox(self, libros):
+        """Actualizar el Text widget con los libros ordenados o filtrados."""
+        self.book_list.delete("1.0", tk.END)  # Eliminar contenido previo
+        for libro in libros:
+            self.insert_book_in_listbox(libro)
 
     def filter_books(self, libros, campo, valor):
         """Filtrar libros según el campo y valor ingresado."""
@@ -189,78 +244,6 @@ class LibraryApp:
             if str(libro[campo_mapeado]).upper() == str(valor).upper()
         ]
 
-    def update_listbox(self, libros):
-        """Actualizar el Listbox con una lista de libros."""
-        self.book_list.delete(0, tk.END)
-        for libro in libros:
-            self.insert_book_in_listbox(libro)
-
-
-    def search_books(self):
-        """Buscar libros según el campo seleccionado."""
-        campo = self.classify_combo.get().lower()  # Obtener el campo seleccionado
-        valor = self.search_entry.get().strip().upper()  # Convertir el valor ingresado a MAYÚSCULAS
-
-        libros = self.libro_manager.listar_libros()  # Obtener todos los libros
-
-        # Mapear los campos seleccionados a las claves reales en los datos
-        campo_mapeado = {
-            "título": "titulo",
-            "año": "fecha",
-            "autor": "autor",
-            "género": "genero",
-            "isbn": "isbn"
-        }.get(campo)
-
-        if not campo_mapeado:
-            messagebox.showerror("Error", "El campo seleccionado no es válido para buscar.")
-            return
-
-        # Si el input está vacío, mostrar todos los libros ordenados según el filtro
-        if not valor:
-            if campo_mapeado == "fecha":  # Año
-                libros_ordenados = merge_sort(libros, key=lambda x: int(x["fecha"]))
-            elif campo_mapeado == "isbn":  # ISBN
-                libros_ordenados = merge_sort(libros, key=lambda x: x["isbn"])
-            elif campo_mapeado == "autor":
-                libros_ordenados = ordenamiento_insercion(libros, key=lambda x: x["autor"])
-            elif campo_mapeado == "genero":
-                libros_ordenados = ordenamiento_seleccion(libros, key=lambda x: x["genero"])
-            else:  # Por defecto, "Titulo"
-                libros_ordenados = ordenamiento_burbuja(libros, key=lambda x: x["titulo"])
-
-            # Mostrar todos los libros ordenados
-            self.book_list.delete(0, tk.END)
-            for libro in libros_ordenados:
-                self.insert_book_in_listbox(libro)
-            return
-
-        # Si el input tiene un valor, seleccionar el método de búsqueda
-        if campo_mapeado == "isbn":  # Para ISBN, usar búsqueda binaria
-            libros_ordenados = merge_sort(libros, key=lambda x: x["isbn"])  # Ordenar por ISBN como string
-            indice = busqueda_binaria(libros_ordenados, valor, key=lambda x: x["isbn"])
-            self.book_list.delete(0, tk.END)
-            if indice != -1:
-                libro = libros_ordenados[indice]
-                self.insert_book_in_listbox(libro)
-            else:
-                self.book_list.insert(tk.END, "No se encontraron resultados.")
-        else:  # Para otros campos, usar búsqueda lineal
-            if campo_mapeado == "fecha":
-                try:
-                    valor = int(valor)  # Convertir a entero para buscar por año
-                except ValueError:
-                    messagebox.showerror("Error", "El valor ingresado para 'Año' debe ser numérico.")
-                    return
-            resultados = busqueda_lineal(libros, valor, key=lambda x: x[campo_mapeado])
-            self.book_list.delete(0, tk.END)
-            if resultados:
-                for libro in resultados:
-                    self.insert_book_in_listbox(libro)
-            else:
-                self.book_list.insert(tk.END, "No se encontraron resultados.")
-
-
     def select_genre(self):
         """Filtrar libros por género seleccionado."""
         genres = list(set([libro["genero"] for libro in self.libro_manager.listar_libros()]))
@@ -274,16 +257,8 @@ class LibraryApp:
         else:
             messagebox.showwarning("Género no válido", "El género ingresado no es válido.")
 
-    def update_genre_button_state(self, event):
-        """Habilitar o inhabilitar el botón de seleccionar género."""
-        if self.classify_combo.get().lower() == "género":
-            self.genre_button.config(state="normal")  # Habilitar
-        else:
-            self.genre_button.config(state="disabled")  # Inhabilitar
-
-
     def select_genre(self):
-        """Seleccionar un género de una lista numerada."""
+        """Filtrar libros por género seleccionado a partir de una lista numerada."""
         genres = [
             "1. ROMANCE",
             "2. FANTASÍA",
@@ -303,26 +278,26 @@ class LibraryApp:
             )
 
             if not selected_number:
-                break  # Cancelar selección
+                break  # Cancelar selección si el usuario no ingresa un valor
 
             try:
                 selected_number = int(selected_number)
                 if 1 <= selected_number <= 9:
                     genre = genres[selected_number - 1].split(". ")[1]
                     self.search_entry.delete(0, tk.END)
-                    self.search_entry.insert(0, genre)
+                    self.search_entry.insert(0, genre)  # Insertar el género seleccionado en el campo de búsqueda
                     break
                 else:
                     messagebox.showerror("Error", "Seleccione un número válido entre 1 y 9.")
             except ValueError:
                 messagebox.showerror("Error", "Debe ingresar un número válido.")
 
-    def insert_book_in_listbox(self, libro):
-        """Inserta un libro en el Listbox con el formato deseado."""
-        self.book_list.insert(
-            tk.END,
-            f"\n{libro['titulo']} - {libro['autor']} ({libro['fecha']})  |  {libro['genero']}  |  ISBN: {libro['isbn']}  |  Cantidad: {libro['cantidad']}\n"
-        )
+    def update_genre_button_state(self, event):
+        """Habilitar o inhabilitar el botón de seleccionar género según el campo seleccionado."""
+        if self.classify_combo.get().lower() == "género":
+            self.genre_button.config(state="normal")  # Habilitar el botón si el campo seleccionado es "Género"
+        else:
+            self.genre_button.config(state="disabled")  # Inhabilitar el botón si no es "Género"
 
     def regresar(self):
         """Cerrar la ventana actual y volver al menú principal."""

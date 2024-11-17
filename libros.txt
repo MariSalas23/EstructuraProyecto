@@ -10,7 +10,7 @@
         "titulo": "PRINCIPE CRUEL",
         "autor": "HOLLY BLACK",
         "genero": "FANTAS\u00cdA",
-        "fecha": 10,
+        "fecha": 2019,
         "cantidad": 2
     },
     "9780123456789": {
@@ -24,14 +24,14 @@
         "titulo": "LA REINA DE NADA",
         "autor": "HOLLY BLACK",
         "genero": "FANTAS\u00cdA",
-        "fecha": 15,
+        "fecha": 2020,
         "cantidad": 1
     },
     "1234567890001": {
-        "titulo": "EJEMPLO",
-        "autor": "A",
-        "genero": "HISTORIA",
-        "fecha": 50,
+        "titulo": "LA RAZON DE ESTAR CONTIGO: LA PROMESA",
+        "autor": "W. BRUCE CAMERON",
+        "genero": "FANTAS\u00cdA",
+        "fecha": 2020,
         "cantidad": 4
     }
 }
