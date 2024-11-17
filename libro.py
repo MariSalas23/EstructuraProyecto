@@ -42,8 +42,16 @@ class Libro:
             return f"El libro con ISBN {isbn} ya existe."
 
     def listar_libros(self):
-        """Devuelve una lista de todos los libros."""
-        return list(self.library_data.values())
+        """Devuelve una lista de libros con sus detalles."""
+        return [{"isbn": isbn, **datos} for isbn, datos in self.library_data.items()]
+
+    def buscar_libro(self, campo, valor):
+        """Busca libros que coincidan con el campo y valor especificados."""
+        return [
+            {"isbn": isbn, **datos}
+            for isbn, datos in self.library_data.items()
+            if campo in datos and valor.lower() in datos[campo].lower()
+        ]
 
     def eliminar_libro(self, isbn):
         if isbn in self.library_data:

@@ -1,6 +1,7 @@
 from tkinter import font, ttk, simpledialog, messagebox
 import tkinter as tk
 from libro import Libro  # Importar la clase Libro desde libro.py
+from metodos import ordenamiento_burbuja  # Importar el método de ordenamiento burbuja
 import subprocess  # Para manejar el regreso al menú principal
 
 
@@ -84,7 +85,8 @@ class LibraryApp:
         classify_label = tk.Label(filters_frame, text="Clasificar por:", font=label_font, bg=white, fg=blue)
         classify_label.pack(anchor="w", padx=10)
 
-        self.classify_combo = ttk.Combobox(filters_frame, values=["Año", "Autor"], state="readonly", font=label_font)
+        self.classify_combo = ttk.Combobox(filters_frame, values=["Título", "Año", "Autor", "ISBN", "Género"], state="readonly", font=label_font)
+        self.classify_combo.set("Título")  # Selección por defecto: "Título"
         self.classify_combo.pack(fill="x", padx=10, pady=5)
 
         genre_button = tk.Button(filters_frame, text="Seleccionar género", command=self.select_genre, bg=blue, fg="white", font=button_font, relief=tk.FLAT)
@@ -103,43 +105,66 @@ class LibraryApp:
         regresar_button = tk.Button(filters_frame, text="Regresar", command=self.regresar, bg=blue, fg="white", font=button_font, relief=tk.FLAT)
         regresar_button.pack(fill="x", padx=10, pady=8)
 
-        # Cargar libros al inicializar
+        # Cargar y mostrar libros al inicializar
         self.load_books()
 
     def load_books(self):
-        self.book_list.delete(0, tk.END)
-        for libro in self.libro_manager.listar_libros():
-            self.book_list.insert(tk.END, f"{libro['titulo']} - {libro['autor']} ({libro['año_publicacion']})")
+        libros = self.libro_manager.listar_libros()
+        print("Libros cargados desde el archivo:", libros)  # Verificar que los libros se cargan correctamente
 
-    def search_books(self):
-        search_text = self.search_entry.get()
-        resultados = self.libro_manager.buscar_libro("titulo", search_text)
+        # Ordenar libros por título (por defecto, de menor a mayor)
+        libros_ordenados = ordenamiento_burbuja(libros, key=lambda x: x["titulo"])
+
+        # Limpiar el Listbox
         self.book_list.delete(0, tk.END)
-        for libro in resultados:
-            self.book_list.insert(tk.END, f"{libro['titulo']} - {libro['autor']} ({libro['año_publicacion']})")
+
+        # Insertar libros ordenados en el Listbox
+        for libro in libros_ordenados:
+            self.book_list.insert(tk.END, f"{libro['titulo']} - {libro['autor']} ({libro['fecha']})")
 
     def sort_asc(self):
-        libros = sorted(self.libro_manager.listar_libros(), key=lambda x: x["titulo"])
+        """Ordenar libros de menor a mayor por título usando ordenamiento burbuja."""
+        libros = self.libro_manager.listar_libros()
+        libros_ordenados = ordenamiento_burbuja(libros, key=lambda x: x["titulo"])
+
+        # Limpiar el Listbox y mostrar los libros ordenados
         self.book_list.delete(0, tk.END)
-        for libro in libros:
-            self.book_list.insert(tk.END, f"{libro['titulo']} - {libro['autor']} ({libro['año_publicacion']})")
+        for libro in libros_ordenados:
+            self.book_list.insert(tk.END, f"{libro['titulo']} - {libro['autor']} ({libro['fecha']})")
 
     def sort_desc(self):
-        libros = sorted(self.libro_manager.listar_libros(), key=lambda x: x["titulo"], reverse=True)
+        """Ordenar libros de mayor a menor por título invirtiendo el resultado del ordenamiento burbuja."""
+        libros = self.libro_manager.listar_libros()
+        libros_ordenados = ordenamiento_burbuja(libros, key=lambda x: x["titulo"])
+        libros_ordenados.reverse()  # Invertir el orden para mayor a menor
+
+        # Limpiar el Listbox y mostrar los libros ordenados
         self.book_list.delete(0, tk.END)
-        for libro in libros:
-            self.book_list.insert(tk.END, f"{libro['titulo']} - {libro['autor']} ({libro['año_publicacion']})")
+        for libro in libros_ordenados:
+            self.book_list.insert(tk.END, f"{libro['titulo']} - {libro['autor']} ({libro['fecha']})")
 
     def select_genre(self):
-        genres = ["Ficción", "No ficción", "Ciencia", "Historia", "Fantasía", "Biografía"]
+        genres = ["ROMANCE", "FANTASÍA", "MISTERIO", "BIOGRAFÍA", "HISTORIA", "ENSAYO", "POESÍA ÉPICA", "POESÍA LÍRICA", "POESÍA CONTEMPLATIVA"]
         selected_genre = simpledialog.askstring("Seleccionar género", f"Seleccione un género:\n{', '.join(genres)}")
         if selected_genre in genres:
             resultados = self.libro_manager.buscar_libro("genero", selected_genre)
             self.book_list.delete(0, tk.END)
             for libro in resultados:
-                self.book_list.insert(tk.END, f"{libro['titulo']} - {libro['autor']} ({libro['año_publicacion']})")
+                self.book_list.insert(tk.END, f"{libro['titulo']} - {libro['autor']} ({libro['fecha']})")
         elif selected_genre is not None:
             messagebox.showwarning("Género no válido", "El género ingresado no es válido.")
+
+    def search_books(self):
+        search_text = self.search_entry.get().strip()
+        if not search_text:
+            messagebox.showinfo("Buscar libros", "Ingrese un término para buscar.")
+            return
+
+        resultados = self.libro_manager.buscar_libro("titulo", search_text)
+        self.book_list.delete(0, tk.END)
+
+        for libro in resultados:
+            self.book_list.insert(tk.END, f"{libro['titulo']} - {libro['autor']} ({libro['fecha']})")
 
     def regresar(self):
         """Cierra la ventana actual y regresa al menú principal."""

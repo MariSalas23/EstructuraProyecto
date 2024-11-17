@@ -44,7 +44,7 @@ class MainInterface:
         content_frame.pack(fill="both", expand=True)
 
         # Título y subtítulo
-        title_label = tk.Label(content_frame, text="Biblioteca JMC", font=title_font, background=self.white, foreground=self.blue)
+        title_label = tk.Label(content_frame, text="Biblioteca JCM", font=title_font, background=self.white, foreground=self.blue)
         title_label.pack(pady=10)
 
         subtitle_label = tk.Label(content_frame, text="¿Qué acción desea?", font=subtitle_font, background=self.white, foreground=self.blue)
@@ -90,7 +90,7 @@ class MainInterface:
         # Muestra un mensaje con la lista de libros cargados
         libros = self.libro_instance.listar_libros()
         if libros:
-            libros_texto = "\n".join([f"{libro['titulo']} - {libro['autor']} ({libro['año_publicacion']})" for libro in libros])
+            libros_texto = "\n".join([f"{libro['titulo']} - {libro['autor']} ({libro['fecha']})" for libro in libros])
             messagebox.showinfo("Lista de Libros", libros_texto)
         else:
             messagebox.showinfo("Lista de Libros", "No hay libros registrados.")
