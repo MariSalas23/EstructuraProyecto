@@ -4,6 +4,7 @@ from example import LibraryApp  # Importa LibraryApp desde el archivo example.py
 from insercion import InsertWindow
 from eliminar import DeleteWindow
 from libro import Libro
+from visualizar import Visualizar  # Importa la clase Visualizar
 
 class MainInterface:
     def __init__(self):
@@ -94,6 +95,8 @@ class MainInterface:
             messagebox.showinfo("Lista de Libros", libros_texto)
         else:
             messagebox.showinfo("Lista de Libros", "No hay libros registrados.")
+        visualizacion = Visualizar(self.libro_instance)  # Crear una instancia de Visualizar
+        visualizacion.mostrar_grafo(self.window)  # Pasar la ventana principal como argumento
 
     def run(self):
         self.window.mainloop()

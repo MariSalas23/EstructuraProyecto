@@ -9,7 +9,7 @@
     "1234567890000": {
         "titulo": "EJEMPLO",
         "autor": "JUANA",
-        "genero": "BIOGRAF\u00cdA",
+        "genero": "HISTORIA",
         "fecha": 2,
         "cantidad": 2
     }
