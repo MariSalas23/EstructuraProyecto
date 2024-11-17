@@ -3,6 +3,7 @@ from tkinter import font
 import networkx as nx
 import matplotlib.pyplot as plt
 from libro import Libro
+from n_ario import GenreTree
 
 class Visualizar:
     def __init__(self, libro_manager):
@@ -81,7 +82,7 @@ class GraphInterface:
         button_font = font.Font(family="Open Sans", size=16, weight="bold")
 
         # Crear la jerarquía de marcos
-        background_frame = tk.Frame(self.root, bg=dark_blue, padx=30, pady=30)
+        background_frame = tk.Frame(self.root, bg=dark_blue, padx=20, pady=20)
         background_frame.pack(fill="both", expand=True)
 
         outer_frame = tk.Frame(background_frame, bg=red, padx=15, pady=15)
@@ -97,6 +98,23 @@ class GraphInterface:
         content_frame = tk.Frame(inner_frame, bg=white)
         content_frame.pack(fill="both", expand=True, padx=15, pady=20)
 
+        # Frame para visualización con scroll
+        display_frame = tk.Frame(content_frame, bg=white)
+        display_frame.pack(fill="both", expand=True, padx=10, pady=10)
+
+        # Text widget con scroll
+        self.display_text = tk.Text(display_frame, height=20, width=80, font=('Open Sans', 10), wrap="word", bg=white)
+        self.display_text.grid(row=0, column=0, sticky=(tk.W, tk.E, tk.N, tk.S))
+
+        # Scrollbar
+        scrollbar = tk.Scrollbar(display_frame, orient="vertical", command=self.display_text.yview)
+        scrollbar.grid(row=0, column=1, sticky=(tk.N, tk.S))
+        self.display_text['yscrollcommand'] = scrollbar.set
+
+        # Configuración del grid
+        display_frame.columnconfigure(0, weight=1)
+        display_frame.rowconfigure(0, weight=1)
+
         # Crear botones en la parte inferior
         button_frame = tk.Frame(inner_frame, bg=light_red)
         button_frame.pack(fill="x", pady=20)
@@ -104,9 +122,12 @@ class GraphInterface:
         # Crear los botones con mayor espacio entre ellos
         self.create_button(button_frame, "Grafo", lambda: self.mostrar_grafo(libro_manager), red, button_font, 0, 0)
         self.create_button(button_frame, "A. Binario", self.placeholder_action, blue, button_font, 0, 1)
-        self.create_button(button_frame, "A. N-ario", self.placeholder_action, red, button_font, 0, 2)
+        self.create_button(button_frame, "A. N-ario", self.mostrar_n_ario_texto, red, button_font, 0, 2)
         self.create_button(button_frame, "A. AVL", self.placeholder_action, blue, button_font, 0, 3)
         self.create_button(button_frame, "Regresar", self.regresar, red, button_font, 0, 4)
+
+        # Cargar el árbol N-ario
+        self.genre_tree = GenreTree()
 
     def create_button(self, parent, text, command, color, font, row, column):
         """Crea un botón y lo posiciona en el grid."""
@@ -119,6 +140,22 @@ class GraphInterface:
         """Muestra el grafo al presionar el botón correspondiente."""
         visualizador = Visualizar(libro_manager)
         visualizador.mostrar_grafo(self.root)
+
+    def mostrar_n_ario_texto(self):
+        """Muestra el árbol N-ario en formato gráfico en el área blanca."""
+        def build_tree_text(node, level=0, prefix="Género: "):
+            """Construye una representación textual del árbol N-ario con formato."""
+            result = " " * (level * 4) + prefix + str(node.value) + "\n"
+            for i, child in enumerate(node.children):
+                child_prefix = f"L── " if i == 0 else f"R── "
+                result += build_tree_text(child, level + 1, child_prefix)
+            return result
+
+        # Limpiar el área de texto
+        self.display_text.delete(1.0, tk.END)
+        # Construir y mostrar el árbol
+        tree_text = build_tree_text(self.genre_tree.root)
+        self.display_text.insert(tk.END, tree_text)
 
     def placeholder_action(self):
         """Acción de marcador de posición para otros botones."""

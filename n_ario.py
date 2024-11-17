@@ -12,14 +12,14 @@ class NAryNode:
 
 class GenreTree:
     def __init__(self):
-        self.root = NAryNode("Literatura", "¿Qué tipo de lectura estás buscando?")
+        self.root = NAryNode("Literatura", "¿Qué tipo de lectura es?")
         self._build_tree()
 
     def _build_tree(self):
         # nodo inicial
-        fiction = NAryNode("Ficción", "¿Qué tipo de historia prefieres?")
+        fiction = NAryNode("Ficción", "¿Qué tipo de historia parece?")
         non_fiction = NAryNode("No Ficción", "¿Qué te interesa explorar?")
-        poetry = NAryNode("Poesía", "¿Qué estilo prefieres?")
+        poetry = NAryNode("Poesía", "¿A qué estilo se parece?")
         self.root.add_child(fiction)
         self.root.add_child(non_fiction)
         self.root.add_child(poetry)
