@@ -71,7 +71,7 @@ class GraphInterface:
     def __init__(self, root, libro_manager):
         self.root = root
         self.root.title("Visualización de Árboles y Grafos")
-        self.root.state("zoomed")  # Abrir en pantalla completa
+        self.root.geometry("960x550")
 
         # Colores
         dark_blue = "#6c93a4"
@@ -87,18 +87,18 @@ class GraphInterface:
         background_frame = tk.Frame(self.root, bg=dark_blue, padx=20, pady=20)
         background_frame.pack(fill="both", expand=True)
 
-        outer_frame = tk.Frame(background_frame, bg=red, padx=15, pady=15)
+        outer_frame = tk.Frame(background_frame, bg=red, padx=10, pady=10)
         outer_frame.pack(fill="both", expand=True)
 
-        middle_frame = tk.Frame(outer_frame, bg=blue, padx=10, pady=10)
+        middle_frame = tk.Frame(outer_frame, bg=blue, padx=5, pady=5)
         middle_frame.pack(fill="both", expand=True)
 
-        inner_frame = tk.Frame(middle_frame, bg=light_red, padx=30, pady=30)
+        inner_frame = tk.Frame(middle_frame, bg=light_red, padx=20, pady=20)
         inner_frame.pack(fill="both", expand=True)
 
         # Área central (blanca) para mostrar resultados
         content_frame = tk.Frame(inner_frame, bg=white)
-        content_frame.pack(fill="both", expand=True, padx=15, pady=20)
+        content_frame.pack(fill="both", expand=True, padx=15, pady=15)
 
         # Frame para visualización con scroll
         display_frame = tk.Frame(content_frame, bg=white)
@@ -119,7 +119,7 @@ class GraphInterface:
 
         # Crear botones en la parte inferior
         button_frame = tk.Frame(inner_frame, bg=light_red)
-        button_frame.pack(fill="x", pady=20)
+        button_frame.pack(fill="x", pady=10)
 
         # Crear los botones con mayor espacio entre ellos
         self.create_button(button_frame, "Grafo", lambda: self.mostrar_grafo(libro_manager), red, button_font, 0, 0)
@@ -141,9 +141,9 @@ class GraphInterface:
     def create_button(self, parent, text, command, color, font, row, column):
         """Crea un botón y lo posiciona en el grid."""
         button = tk.Button(
-            parent, text=text, command=command, bg=color, fg="white", font=font, width=14, height=2, relief=tk.FLAT
+            parent, text=text, command=command, bg=color, fg="white", font=font, width=10, height=1, relief=tk.FLAT
         )
-        button.grid(row=row, column=column, padx=15, pady=10)  # Espacio entre botones
+        button.grid(row=row, column=column, padx=15, pady=5)  # Espacio entre botones
 
     def _cargar_libros_avl(self):
         """Carga los libros en el árbol AVL, utilizando el año de publicación como clave."""

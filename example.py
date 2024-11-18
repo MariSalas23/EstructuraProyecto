@@ -11,7 +11,7 @@ class LibraryApp:
         self.root.title("Búsqueda")
 
         # Configurar ventana para pantalla completa
-        self.root.state('zoomed')
+        self.window.geometry("1920x1080")
 
         # Crear instancia de Libro
         self.libro_manager = Libro()
