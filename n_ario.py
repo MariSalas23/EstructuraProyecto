@@ -58,7 +58,7 @@ class GenreTree:
             selected_child = node.children[choice - 1]
             return self.guided_search(selected_child)
         else:
-            return "Selección no válida. Por favor, intenta de nuevo."
+            return "Selección no válida."
 
     def find_genre(self):
         return self.guided_search(self.root)
